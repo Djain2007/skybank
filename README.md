@@ -21,7 +21,3 @@ To demonstrate transfers, you can create the following accounts through the regi
 - Username: `bob` (Gets account SKY-10002 with 20,000 SKY)
 
 *Note: For the best demonstration of client-side cryptography, do this in two separate browsers or incognito windows.*
-
-## Academic Purpose
-This project is built explicitly for educational purposes. 
-See `docs/course-mapping.md` for a complete mapping to the Cryptography syllabus.

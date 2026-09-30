@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkyBank
+**Secure Banking. Built on Trust.**
 
-## Getting Started
+SkyBank is an educational secure online banking transaction simulator designed to demonstrate real-world cryptographic concepts.
 
-First, run the development server:
+## Features
+- Hybrid Encryption (AES-GCM & RSA-OAEP) for transactions
+- Digital Signatures (RSA-PSS) for transaction integrity and non-repudiation
+- Password Hashing (Argon2id)
+- Replay Protection (Nonces & Timestamps)
+- Educational Labs & Security Attack demonstrations
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Quick Start
+1. `npm install`
+2. `npm run dev`
+3. Open [http://localhost:3000](http://localhost:3000)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Demo Accounts
+To demonstrate transfers, you can create the following accounts through the registration page (the system will assign specific test balances):
+- Username: `alice` (Gets account SKY-10001 with 50,000 SKY)
+- Username: `bob` (Gets account SKY-10002 with 20,000 SKY)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*Note: For the best demonstration of client-side cryptography, do this in two separate browsers or incognito windows.*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Academic Purpose
+This project is built explicitly for educational purposes. 
+See `docs/course-mapping.md` for a complete mapping to the Cryptography syllabus.

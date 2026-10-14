@@ -1,208 +1,285 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
+import type { Session } from "@/lib/types";
+import { SessionContext } from "./Session";
+import { LogoMark, Wordmark } from "./Logo";
+import {
+  CloseIcon,
+  FileIcon,
+  FlaskIcon,
+  GridIcon,
+  ListIcon,
+  LogOutIcon,
+  MenuIcon,
+  ShieldIcon,
+  TransferIcon,
+} from "./Icons";
+import styles from "./DashboardLayout.module.css";
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: ComponentType<{ size?: number }>;
+}
+
+interface NavGroup {
+  label: string;
+  /** The security group is coloured purple: it is the cryptographic layer. */
+  tone: "banking" | "security";
+  items: NavItem[];
+}
+
+const navigation: NavGroup[] = [
+  {
+    label: "Banking",
+    tone: "banking",
+    items: [
+      { href: "/", label: "Overview", icon: GridIcon },
+      { href: "/transfer", label: "Transfer", icon: TransferIcon },
+      { href: "/transactions", label: "Transactions", icon: ListIcon },
+    ],
+  },
+  {
+    label: "Security",
+    tone: "security",
+    items: [
+      { href: "/crypto-lab", label: "Cryptography lab", icon: FlaskIcon },
+      { href: "/security-tests", label: "Security tests", icon: ShieldIcon },
+      { href: "/audit", label: "Audit log", icon: FileIcon },
+    ],
+  },
+];
+
+function initialsOf(fullName: string): string {
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+/** Returns the current session, or null when the cookie is missing or expired. */
+async function fetchSession(): Promise<Session | null> {
+  const res = await fetch("/api/auth/me", { cache: "no-store" });
+  if (!res.ok) return null;
+  return (await res.json()) as Session;
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => {
-        if (!res.ok) {
-          router.push('/login');
-          return null;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) setUser(data.user);
-      });
+    let cancelled = false;
+    fetchSession().then((data) => {
+      if (cancelled) return;
+      if (!data) {
+        router.replace("/login");
+        return;
+      }
+      setSession(data);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [mobileMenuOpen]);
+  const refresh = useCallback(async () => {
+    const data = await fetchSession();
+    if (data) setSession(data);
+  }, []);
 
-  // Close mobile menu on route change
+  // Lock page scroll and allow Escape while the drawer is open.
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+    if (!menuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   const handleLogout = async () => {
-    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    router.push('/login');
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.replace("/login");
   };
 
-  if (!user) return <div style={{ padding: '2rem' }}>Loading...</div>;
+  if (!session) {
+    return <LoadingShell />;
+  }
 
-  const sidebarContent = (
-    <>
-      <div style={{ padding: '0 1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ color: 'var(--skybank-navy)', margin: 0, fontSize: '1.5rem', letterSpacing: '-0.5px', textAlign: 'left' }}>
-            SkyBank<span style={{ color: 'var(--skybank-accent)' }}>.</span>
-          </h1>
-          <p style={{ fontSize: '0.75rem', color: 'var(--skybank-text-secondary)', textAlign: 'left' }}>Educational Simulation</p>
+  const sidebar = (
+    <Sidebar
+      session={session}
+      pathname={pathname}
+      onLogout={handleLogout}
+      onClose={() => setMenuOpen(false)}
+    />
+  );
+
+  return (
+    <SessionContext.Provider value={{ session, refresh }}>
+      <div className={styles.shell}>
+        <aside className={styles.sidebar}>{sidebar}</aside>
+
+        <div className={styles.column}>
+          <header className={styles.topbar}>
+            <Link href="/" className={styles.topbarBrand} aria-label="SkyBank overview">
+              <LogoMark size={26} />
+              <Wordmark />
+            </Link>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+            >
+              <MenuIcon size={22} />
+            </button>
+          </header>
+
+          <main className={styles.main}>{children}</main>
         </div>
-        {/* Mobile close button (only visible on mobile layout via CSS, but we can just inline it if menu is open) */}
-        <button 
-          className="hide-on-desktop" 
-          onClick={() => setMobileMenuOpen(false)}
-          style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem', color: 'var(--skybank-text-secondary)' }}
+
+        {menuOpen && (
+          <button
+            type="button"
+            className={styles.overlay}
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            tabIndex={-1}
+          />
+        )}
+        <aside
+          className={`${styles.drawer} ${menuOpen ? styles.drawerOpen : ""}`}
+          aria-hidden={!menuOpen}
+        >
+          {sidebar}
+        </aside>
+      </div>
+    </SessionContext.Provider>
+  );
+}
+
+interface SidebarProps {
+  session: Session;
+  pathname: string;
+  onLogout: () => void;
+  onClose: () => void;
+}
+
+function Sidebar({ session, pathname, onLogout, onClose }: SidebarProps) {
+  return (
+    <>
+      <div className={styles.brand}>
+        <Link href="/" className={styles.brandLink} aria-label="SkyBank overview">
+          <LogoMark />
+          <span className={styles.brandText}>
+            <Wordmark />
+            <span className={styles.brandSub}>Educational simulator</span>
+          </span>
+        </Link>
+        <button
+          type="button"
+          className={`icon-btn ${styles.drawerClose}`}
+          onClick={onClose}
           aria-label="Close menu"
         >
-          ×
+          <CloseIcon size={20} />
         </button>
       </div>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, textAlign: 'left' }}>
-        <NavItem href="/" label="Overview" current={pathname === '/'} />
-        <NavItem href="/transfer" label="Transfers" current={pathname === '/transfer'} />
-        <NavItem href="/transactions" label="Transactions" current={pathname === '/transactions'} />
-        <div style={{ padding: '1rem 1.5rem 0.25rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--skybank-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Security
-        </div>
-        <NavItem href="/crypto-lab" label="Cryptography Lab" current={pathname === '/crypto-lab'} />
-        <NavItem href="/security-tests" label="Security Tests" current={pathname === '/security-tests'} />
-        <NavItem href="/audit" label="Audit Logs" current={pathname === '/audit'} />
+      <nav className={styles.nav} aria-label="Main">
+        {navigation.map((group) => (
+          <div key={group.label} className={styles.group} data-tone={group.tone}>
+            <div className={styles.groupLabel}>{group.label}</div>
+            {group.items.map((item) => {
+              const active = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.item} ${active ? styles.itemActive : ""}`}
+                  aria-current={active ? "page" : undefined}
+                  onClick={onClose}
+                >
+                  <Icon size={18} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      <div style={{ padding: '1.5rem', textAlign: 'left' }}>
-        <div style={{ fontSize: '0.875rem', color: 'var(--skybank-text-primary)', marginBottom: '0.5rem' }}>
-          {user.fullName}
+      <div className={styles.user}>
+        <div className={styles.avatar} aria-hidden="true">
+          {initialsOf(session.user.fullName)}
         </div>
-        <button onClick={handleLogout} className="btn btn-secondary" style={{ width: '100%' }}>
-          Log out
+        <div className={styles.userText}>
+          <div className={styles.userName}>{session.user.fullName}</div>
+          <div className={`${styles.userAccount} mono`}>{session.account.accountNumber}</div>
+        </div>
+        <button type="button" className="icon-btn" onClick={onLogout} aria-label="Log out" title="Log out">
+          <LogOutIcon size={18} />
         </button>
       </div>
     </>
   );
+}
 
+/** Skeleton shown while the session is being fetched, so the layout doesn't jump. */
+function LoadingShell() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        .sidebar-desktop { display: none; }
-        .mobile-topbar { display: flex; }
-        .hide-on-desktop { display: block; }
-        .main-content { padding: 1.5rem; }
-        
-        @media (min-width: 769px) {
-          .sidebar-desktop { display: flex; }
-          .mobile-topbar { display: none; }
-          .hide-on-desktop { display: none !important; }
-          .main-content { padding: 3rem 4rem; }
-        }
-      `}} />
-
-      {/* Mobile Top Bar */}
-      <header className="mobile-topbar" style={{ 
-        height: '60px', 
-        backgroundColor: 'var(--skybank-surface)', 
-        borderBottom: '1px solid var(--skybank-border)',
-        alignItems: 'center',
-        padding: '0 1rem',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 40
-      }}>
-        <h1 style={{ color: 'var(--skybank-navy)', margin: 0, fontSize: '1.25rem', letterSpacing: '-0.5px' }}>
-          SkyBank<span style={{ color: 'var(--skybank-accent)' }}>.</span>
-        </h1>
-        <button 
-          onClick={() => setMobileMenuOpen(true)}
-          style={{ background: 'none', border: 'none', padding: '0.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '4px' }}
-          aria-label="Open menu"
-        >
-          <span style={{ display: 'block', width: '20px', height: '2px', backgroundColor: 'var(--skybank-navy)' }}></span>
-          <span style={{ display: 'block', width: '20px', height: '2px', backgroundColor: 'var(--skybank-navy)' }}></span>
-          <span style={{ display: 'block', width: '20px', height: '2px', backgroundColor: 'var(--skybank-navy)' }}></span>
-        </button>
-      </header>
-
-      <div style={{ display: 'flex', flex: 1 }}>
-        {/* Desktop Sidebar */}
-        <aside className="sidebar-desktop" style={{
-          width: '240px',
-          backgroundColor: '#FFFFFF',
-          borderRight: '1px solid var(--skybank-border)',
-          flexDirection: 'column',
-          padding: '1.5rem 0',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflowY: 'auto'
-        }}>
-          {sidebarContent}
-        </aside>
-
-        {/* Mobile Drawer Overlay */}
-        {mobileMenuOpen && (
-          <div 
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              position: 'fixed',
-              top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: 'rgba(16, 42, 67, 0.4)',
-              zIndex: 45
-            }}
-          />
-        )}
-
-        {/* Mobile Drawer */}
-        <aside style={{
-          position: 'fixed',
-          top: 0, bottom: 0, left: 0,
-          width: '260px',
-          backgroundColor: '#FFFFFF',
-          zIndex: 50,
-          transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 250ms ease-in-out',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '1.5rem 0',
-          overflowY: 'auto'
-        }}>
-          {sidebarContent}
-        </aside>
-
-        {/* Main Content */}
-        <main className="main-content" style={{ flex: 1, backgroundColor: 'var(--skybank-background)', minWidth: 0 }}>
-          {children}
+    <div className={styles.shell} aria-busy="true" aria-live="polite">
+      <aside className={styles.sidebar}>
+        <div className={styles.brand}>
+          <LogoMark />
+          <span className={styles.brandText}>
+            <Wordmark />
+            <span className={styles.brandSub}>Educational simulator</span>
+          </span>
+        </div>
+        <div className={styles.nav}>
+          <div className={styles.group}>
+            {[88, 72, 104].map((w, i) => (
+              <span key={i} className="skeleton" style={{ height: 14, width: w, margin: "11px 10px" }} />
+            ))}
+          </div>
+          <div className={styles.group}>
+            {[124, 110, 80].map((w, i) => (
+              <span key={i} className="skeleton" style={{ height: 14, width: w, margin: "11px 10px" }} />
+            ))}
+          </div>
+        </div>
+      </aside>
+      <div className={styles.column}>
+        <header className={styles.topbar}>
+          <span className={styles.topbarBrand}>
+            <LogoMark size={26} />
+            <Wordmark />
+          </span>
+        </header>
+        <main className={styles.main}>
+          <span className="skeleton" style={{ height: 26, width: 220, marginBottom: 12 }} />
+          <span className="skeleton" style={{ height: 14, width: 320, marginBottom: 32 }} />
+          <span className="skeleton" style={{ height: 180, width: "100%", maxWidth: 680, borderRadius: 12 }} />
+          <span className="sr-only">Loading your account</span>
         </main>
       </div>
     </div>
-  );
-}
-
-function NavItem({ href, label, current }: { href: string, label: string, current: boolean }) {
-  return (
-    <Link 
-      href={href} 
-      style={{
-        padding: '0.625rem 1.5rem',
-        textDecoration: 'none',
-        color: current ? 'var(--skybank-navy)' : 'var(--skybank-text-secondary)',
-        backgroundColor: current ? '#F0F4F8' : 'transparent',
-        borderRight: current ? '3px solid var(--skybank-accent)' : '3px solid transparent',
-        fontWeight: current ? 500 : 400,
-        fontSize: '0.875rem',
-        display: 'block'
-      }}
-    >
-      {label}
-    </Link>
   );
 }

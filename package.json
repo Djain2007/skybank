@@ -2,6 +2,7 @@
   "name": "skybank",
   "version": "0.1.0",
   "private": true,
+  "description": "Educational online-banking simulator that makes the cryptography behind every transfer visible.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

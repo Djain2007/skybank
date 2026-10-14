@@ -1,58 +1,125 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import DashboardLayout from '../components/DashboardLayout';
-import { 
-  canonicalizeTransaction, 
-  generateAESKey, 
-  encryptAESGCM, 
-  encryptAESKeyWithServerRSA, 
+import PageHeader from '../components/PageHeader';
+import { useSession } from '../components/Session';
+import { PlayIcon } from '../components/Icons';
+import {
+  canonicalizeTransaction,
+  generateAESKey,
+  encryptAESGCM,
+  encryptAESKeyWithServerRSA,
   signData
 } from '@/lib/crypto/client';
+import styles from './page.module.css';
 
-export default function SecurityTests() {
+type TestType = 'Amount Tampering' | 'Signature Tampering' | 'Ciphertext Tampering' | 'Replay Attack';
+
+interface TestCase {
+  type: TestType;
+  name: string;
+  attack: string;
+  defence: string;
+}
+
+const tests: TestCase[] = [
+  {
+    type: 'Amount Tampering',
+    name: 'Amount tampering',
+    attack: 'Sign a transfer of 5,000 SKY, then change the submitted amount to 50,000.',
+    defence: 'The RSA-PSS signature covers the amount, so verification fails.',
+  },
+  {
+    type: 'Signature Tampering',
+    name: 'Forged signature',
+    attack: 'Flip one character inside an otherwise valid signature.',
+    defence: 'Signature verification against your public key rejects it.',
+  },
+  {
+    type: 'Ciphertext Tampering',
+    name: 'Modified ciphertext',
+    attack: 'Flip one character of the AES-GCM ciphertext in transit.',
+    defence: 'The GCM authentication tag no longer matches and decryption is refused.',
+  },
+  {
+    type: 'Replay Attack',
+    name: 'Replay attack',
+    attack: 'Send a valid 5,000 SKY transfer to your own account, then send the identical message again.',
+    defence: 'The nonce was already recorded by the first send, so the second copy is rejected.',
+  },
+];
+
+/** Replace one character of a Base64 string with a different one, so the data is always altered. */
+function flipCharacter(value: string, index = 10): string {
+  const replacement = value[index] === 'A' ? 'B' : 'A';
+  return value.substring(0, index) + replacement + value.substring(index + 1);
+}
+
+function testTransactionId(): string {
+  return 'TX-TEST-' + Math.floor(Math.random() * 900000);
+}
+
+export default function SecurityTestsPage() {
+  return (
+    <DashboardLayout>
+      <SecurityTests />
+    </DashboardLayout>
+  );
+}
+
+function SecurityTests() {
+  const { session, refresh } = useSession();
+  const [running, setRunning] = useState<TestType | null>(null);
   const [status, setStatus] = useState<string>('');
   const [result, setResult] = useState<string>('');
   const [serverPublicKey, setServerPublicKey] = useState('');
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     fetch('/api/config').then(res => res.json()).then(data => setServerPublicKey(data.publicKey));
-    fetch('/api/auth/me').then(res => res.json()).then(data => { if (!data.error) setUser(data); });
   }, []);
 
-  const runTest = async (testType: string) => {
-    setStatus(`Running: ${testType}...`);
+  const runTest = async (testType: TestType) => {
+    setRunning(testType);
+    setStatus(`Running ${testType.toLowerCase()}`);
     setResult('');
-    
+
     try {
-      const transactionId = 'TX-TEST-' + Math.floor(Math.random() * 900000);
+      const transactionId = testTransactionId();
       const timestamp = new Date().toISOString();
       const amount = 5000;
-      const recipient = 'SKY-99999';
-      
-      const jwkStr = localStorage.getItem(`skybank_priv_${user.user.username}`);
-      if (!jwkStr) throw new Error("Private key not found.");
+      // The tampering tests are rejected by the cryptographic checks before the recipient
+      // is ever looked up, so a non-existent recipient is fine for them. The replay test
+      // needs its first send to succeed, so it targets the sender's own account: a
+      // net-zero transfer that lets the duplicate be refused for nonce reuse.
+      const recipient = testType === 'Replay Attack' ? session.account.accountNumber : 'SKY-99999';
+
+      const jwkStr = localStorage.getItem(`skybank_priv_${session.user.username}`);
+      if (!jwkStr) throw new Error('Your signing key is not in this browser.');
       const privateKey = await window.crypto.subtle.importKey('jwk', JSON.parse(jwkStr), { name: 'RSA-PSS', hash: 'SHA-256' }, false, ['sign']);
 
       const aesKey = await generateAESKey();
-      
-      let payloadObj = { sender: user.account.accountNumber, recipient, amount, description: 'Test', timestamp, transactionId };
-      
+
+      const payloadObj = { sender: session.account.accountNumber, recipient, amount, description: 'Test', timestamp, transactionId };
+
       // TEST 1: Amount Tampering
       if (testType === 'Amount Tampering') payloadObj.amount = 50000;
-      
-      const payloadString = JSON.stringify(payloadObj);
-      let { ciphertext, iv: aesNonce, authTag } = await encryptAESGCM(payloadString, aesKey);
 
-      const canonicalData = canonicalizeTransaction(user.account.accountNumber, recipient, 5000, timestamp, aesNonce, 'Test');
+      const payloadString = JSON.stringify(payloadObj);
+      const encrypted = await encryptAESGCM(payloadString, aesKey);
+      let ciphertext = encrypted.ciphertext;
+      const aesNonce = encrypted.iv;
+      const authTag = encrypted.authTag;
+
+      const canonicalData = canonicalizeTransaction(session.account.accountNumber, recipient, 5000, timestamp, aesNonce, 'Test');
       let signature = await signData(canonicalData, privateKey);
 
       // TEST 2: Signature Tampering
-      if (testType === 'Signature Tampering') signature = signature.substring(0, 10) + 'A' + signature.substring(11);
+      if (testType === 'Signature Tampering') signature = flipCharacter(signature);
 
       // TEST 3: Ciphertext Tampering
-      if (testType === 'Ciphertext Tampering') ciphertext = ciphertext.substring(0, 10) + 'A' + ciphertext.substring(11);
+      if (testType === 'Ciphertext Tampering') ciphertext = flipCharacter(ciphertext);
 
       const encryptedAesKey = await encryptAESKeyWithServerRSA(aesKey, serverPublicKey);
 
@@ -60,14 +127,14 @@ export default function SecurityTests() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ciphertext, nonce: aesNonce, authTag, encryptedAesKey, signature, transactionId, timestamp, 
-          senderAccount: user.account.accountNumber, recipientAccount: recipient, 
+          ciphertext, nonce: aesNonce, authTag, encryptedAesKey, signature, transactionId, timestamp,
+          senderAccount: session.account.accountNumber, recipientAccount: recipient,
           amount: testType === 'Amount Tampering' ? 50000 : 5000, description: 'Test'
         })
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         setResult(`BLOCKED: ${data.error}`);
       } else {
@@ -76,11 +143,11 @@ export default function SecurityTests() {
 
       // TEST 4: Replay Attack
       if (testType === 'Replay Attack' && res.ok) {
-        setStatus(`Running: ${testType} (Sending duplicate)...`);
+        setStatus('Running replay attack: sending the duplicate');
         const replayRes = await fetch('/api/transfer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ciphertext, nonce: aesNonce, authTag, encryptedAesKey, signature, transactionId, timestamp, senderAccount: user.account.accountNumber, recipientAccount: recipient, amount: 5000, description: 'Test' })
+          body: JSON.stringify({ ciphertext, nonce: aesNonce, authTag, encryptedAesKey, signature, transactionId, timestamp, senderAccount: session.account.accountNumber, recipientAccount: recipient, amount: 5000, description: 'Test' })
         });
         const replayData = await replayRes.json();
         if (!replayRes.ok) {
@@ -88,60 +155,81 @@ export default function SecurityTests() {
         } else {
           setResult('WARNING: Replay succeeded!');
         }
+        await refresh();
       }
 
-    } catch (err: any) {
-      setResult(`ERROR: ${err.message}`);
+    } catch (err) {
+      setResult(`ERROR: ${err instanceof Error ? err.message : String(err)}`);
     }
-    setStatus('Test Complete.');
+    setStatus(`Finished: ${tests.find(t => t.type === testType)?.name ?? testType}.`);
+    setRunning(null);
   };
 
-  if (!user) return <DashboardLayout><div style={{ padding: '2rem' }}>Loading...</div></DashboardLayout>;
+  const blocked = result.startsWith('BLOCKED');
 
   return (
-    <DashboardLayout>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 500 }}>Security Tests</h2>
-        <p style={{ color: 'var(--skybank-text-secondary)', marginBottom: '3rem' }}>
-          Educational lab to demonstrate active attacks and cryptographic defenses in real-time.
-        </p>
+    <div className={styles.page}>
+      <PageHeader
+        title="Security tests"
+        description="Run a real attack against your own account and watch the server refuse it. Each test builds a genuine transfer, breaks one thing, and sends it."
+      />
 
-        <style dangerouslySetInnerHTML={{__html: `
-          .test-buttons { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
-          @media (min-width: 768px) { .test-buttons { flex-direction: row; flex-wrap: wrap; } }
-        `}} />
-
-        <div className="test-buttons">
-          <button onClick={() => runTest('Amount Tampering')} className="btn btn-secondary">Test: Amount Tampering</button>
-          <button onClick={() => runTest('Signature Tampering')} className="btn btn-secondary">Test: Invalid Signature</button>
-          <button onClick={() => runTest('Ciphertext Tampering')} className="btn btn-secondary">Test: Modified Ciphertext</button>
-          <button onClick={() => runTest('Replay Attack')} className="btn btn-secondary">Test: Replay Attack</button>
-        </div>
-
-        <div className="card">
-          <h3 style={{ fontSize: '1.125rem', color: 'var(--skybank-navy)', marginBottom: '1rem', fontWeight: 500 }}>Test Output</h3>
-          <div style={{ padding: '1rem', background: '#F0F4F8', fontFamily: 'monospace', minHeight: '120px', borderRadius: '6px', fontSize: '0.875rem' }}>
-            <div style={{ color: 'var(--skybank-text-secondary)', marginBottom: '1rem' }}>{status || 'Select a test above to run an active attack simulation.'}</div>
-            {result && (
-              <div style={{ 
-                padding: '0.75rem', 
-                borderRadius: '4px',
-                backgroundColor: result.includes('BLOCKED') ? '#E6FFFA' : '#FFF5F5',
-                color: result.includes('BLOCKED') ? 'var(--skybank-success)' : 'var(--skybank-error)',
-                fontWeight: 600
-              }}>
-                {result}
+      <section className={`card ${styles.tests}`} aria-label="Attack simulations">
+        {tests.map(test => {
+          const isRunning = running === test.type;
+          return (
+            <div key={test.type} className={styles.test}>
+              <div className={styles.testText}>
+                <div className={styles.testName}>{test.name}</div>
+                <dl className={styles.testMeta}>
+                  <div>
+                    <dt>Attack</dt>
+                    <dd>{test.attack}</dd>
+                  </div>
+                  <div>
+                    <dt>Expected defence</dt>
+                    <dd>{test.defence}</dd>
+                  </div>
+                </dl>
               </div>
-            )}
-          </div>
-        </div>
+              <button
+                type="button"
+                onClick={() => runTest(test.type)}
+                className="btn btn-secondary"
+                disabled={running !== null || !serverPublicKey}
+              >
+                {isRunning ? <span className="spinner" aria-hidden="true" /> : <PlayIcon size={16} />}
+                {isRunning ? 'Running' : 'Run test'}
+              </button>
+            </div>
+          );
+        })}
+      </section>
 
-        <div style={{ marginTop: '2.5rem' }}>
-          <p style={{ fontSize: '0.875rem', color: 'var(--skybank-text-secondary)' }}>
-            <strong>Note:</strong> When an attack is blocked, an immutable record is securely written to the <a href="/audit" style={{ fontWeight: 500 }}>Audit Log</a>.
-          </p>
+      <section className={`card ${styles.console}`} aria-label="Test output" aria-live="polite">
+        <div className="card-header">
+          <h2 className="card-title">Output</h2>
+          {result && (
+            <span className={`badge ${blocked ? 'badge-success' : 'badge-error'}`}>
+              {blocked ? 'Attack blocked' : 'Attention'}
+            </span>
+          )}
         </div>
-      </div>
-    </DashboardLayout>
+        <div className={styles.consoleBody}>
+          <div className={styles.consoleStatus}>
+            {status || 'Choose a test above. The server’s response will appear here.'}
+          </div>
+          {result && (
+            <pre className={`${styles.consoleResult} ${blocked ? styles.consoleOk : styles.consoleBad}`}>{result}</pre>
+          )}
+        </div>
+      </section>
+
+      <p className={styles.note}>
+        Every blocked attempt is written to the <Link href="/audit">audit log</Link> with the reason the
+        server gave. The replay test&apos;s first send is a transfer to yourself, so your balance does
+        not change.
+      </p>
+    </div>
   );
 }

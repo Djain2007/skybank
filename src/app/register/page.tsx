@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import AuthLayout from '../components/AuthLayout';
+import { AlertIcon } from '../components/Icons';
 import { generateUserRSAKeys, exportPublicKeyToPem } from '@/lib/crypto/client';
+import styles from '../auth.module.css';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -12,112 +16,161 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
-  
+
   const router = useRouter();
+  const busy = status !== '';
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('The two passwords do not match.');
       return;
     }
 
     try {
-      setStatus('Generating RSA-PSS key pair in browser...');
+      setStatus('Generating your RSA-PSS key pair in this browser');
       const keyPair = await generateUserRSAKeys();
       const publicKeyPem = await exportPublicKeyToPem(keyPair.publicKey);
-      
-      setStatus('Registering account with server...');
+
+      setStatus('Creating your account');
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName, username, email, password, publicKey: publicKeyPem })
       });
-      
+
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Registration failed');
       }
 
       const privateKeyJwk = await window.crypto.subtle.exportKey('jwk', keyPair.privateKey);
       localStorage.setItem(`skybank_priv_${username}`, JSON.stringify(privateKeyJwk));
-      
-      setStatus('Registration successful. Redirecting...');
+
+      setStatus('Account created. Opening your overview');
       router.push('/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
       setStatus('');
     }
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--skybank-background)', padding: '1.5rem' }}>
-      <div style={{ margin: '0 auto', width: '100%', maxWidth: '480px' }}>
-        
-        <div style={{ marginBottom: '2rem', marginTop: '2rem' }}>
-          <h1 style={{ color: 'var(--skybank-navy)', margin: 0, fontSize: '1.5rem', letterSpacing: '-0.5px', textAlign: 'left' }}>
-            SkyBank<span style={{ color: 'var(--skybank-accent)' }}>.</span>
-          </h1>
+    <AuthLayout>
+      <h1 className={styles.title}>Create an account</h1>
+      <p className={styles.lead}>
+        Your signing key pair is generated here in the browser. The private key never leaves it.
+      </p>
+
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <AlertIcon size={18} />
+          <div>{error}</div>
+        </div>
+      )}
+
+      <form onSubmit={handleRegister} className={styles.form}>
+        <p className={styles.section}>About you</p>
+
+        <div className="field">
+          <label className="label" htmlFor="fullName">Full name</label>
+          <input
+            id="fullName"
+            type="text"
+            className="input"
+            autoComplete="name"
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
+            required
+            disabled={busy}
+          />
         </div>
 
-        <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', textAlign: 'left' }}>Create Account</h2>
-        
-        {error && (
-          <div style={{ padding: '1rem', backgroundColor: '#FFF5F5', color: 'var(--skybank-error)', borderRadius: '6px', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-            {error}
-          </div>
-        )}
-        
+        <div className="field">
+          <label className="label" htmlFor="email">Email address</label>
+          <input
+            id="email"
+            type="email"
+            className="input"
+            autoComplete="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            disabled={busy}
+          />
+        </div>
+
+        <p className={styles.section}>Sign-in details</p>
+
+        <div className="field">
+          <label className="label" htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            className="input"
+            autoComplete="username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            required
+            disabled={busy}
+          />
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            className="input"
+            autoComplete="new-password"
+            minLength={8}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            disabled={busy}
+          />
+          <span className="hint">At least 8 characters.</span>
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="confirmPassword">Confirm password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            className="input"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            required
+            disabled={busy}
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={busy}>
+          {busy ? <span className="spinner spinner-light" aria-hidden="true" /> : null}
+          {busy ? 'Creating account' : 'Create account'}
+        </button>
+
         {status && (
-          <div style={{ padding: '1rem', backgroundColor: '#E6FFFA', color: 'var(--skybank-success)', borderRadius: '6px', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+          <div className={styles.progress} role="status" aria-live="polite">
+            <span className="spinner" aria-hidden="true" />
             {status}
           </div>
         )}
+      </form>
 
-        <form onSubmit={handleRegister} className="card" style={{ padding: '2rem' }}>
-          
-          <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--skybank-text-secondary)', borderBottom: '1px solid var(--skybank-border)', paddingBottom: '0.5rem' }}>Personal Information</h3>
-          
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <input type="text" className="form-input" value={fullName} onChange={e => setFullName(e.target.value)} required />
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} required />
-          </div>
-
-          <h3 style={{ fontSize: '1rem', marginBottom: '1rem', marginTop: '2rem', color: 'var(--skybank-text-secondary)', borderBottom: '1px solid var(--skybank-border)', paddingBottom: '0.5rem' }}>Account Security</h3>
-
-          <div className="form-group">
-            <label className="form-label">Username</label>
-            <input type="text" className="form-input" value={username} onChange={e => setUsername(e.target.value)} required />
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input type="password" className="form-input" value={password} onChange={e => setPassword(e.target.value)} required />
-            <div style={{ fontSize: '0.75rem', color: 'var(--skybank-text-secondary)', marginTop: '0.25rem' }}>Must be at least 8 characters long.</div>
-          </div>
-
-          <div className="form-group" style={{ marginBottom: '2rem' }}>
-            <label className="form-label">Confirm Password</label>
-            <input type="password" className="form-input" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
-          </div>
-          
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-            Register Account
-          </button>
-
-          <div style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--skybank-text-secondary)', textAlign: 'left' }}>
-            <p>Already have an account? <a href="/login">Sign in</a></p>
-          </div>
-        </form>
+      <div className={styles.demo}>
+        Demo accounts: register as <code>daksh</code> for SKY-10001 with 50,000 SKY, or{' '}
+        <code>jash</code> for SKY-10002 with 20,000 SKY. Use two browsers or a private window to
+        run both at once.
       </div>
-    </div>
+
+      <p className={styles.switch}>
+        Already have an account? <Link href="/login">Sign in</Link>
+      </p>
+    </AuthLayout>
   );
 }

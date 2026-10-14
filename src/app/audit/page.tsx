@@ -2,65 +2,81 @@
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
+import type { AuditLog } from '@/lib/types';
+import { formatDateTime } from '@/lib/format';
+import styles from './page.module.css';
 
-export default function AuditLogs() {
-  const [logs, setLogs] = useState<any[]>([]);
+export default function AuditPage() {
+  return (
+    <DashboardLayout>
+      <AuditLogs />
+    </DashboardLayout>
+  );
+}
+
+function AuditLogs() {
+  const [logs, setLogs] = useState<AuditLog[] | null>(null);
 
   useEffect(() => {
     fetch('/api/audit')
       .then(res => res.json())
-      .then(data => {
-        if (data.logs) setLogs(data.logs);
-      });
+      .then(data => setLogs(data.logs ?? []))
+      .catch(() => setLogs([]));
   }, []);
 
   return (
-    <DashboardLayout>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 500 }}>Audit Logs</h2>
-        <p style={{ color: 'var(--skybank-text-secondary)', marginBottom: '3rem' }}>
-          Immutable system and security event logs.
-        </p>
+    <div className={styles.page}>
+      <PageHeader
+        title="Audit log"
+        description="Security events recorded by the server: sign-ins, completed transfers, and every rejected attempt with the reason it was refused."
+      />
 
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <table className="responsive-table">
-            <thead>
-              <tr>
-                <th>Timestamp</th>
-                <th>Event Type</th>
-                <th>Result</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 ? (
+      <section className="card" aria-label="Audit events">
+        {logs === null ? (
+          <div className={styles.loadingRows} aria-busy="true">
+            {[0, 1, 2, 3, 4].map(i => <span key={i} className="skeleton" style={{ height: 14 }} />)}
+          </div>
+        ) : logs.length === 0 ? (
+          <div className="table-empty">
+            Nothing recorded yet. Events appear here as you sign in, transfer, or run a security test.
+          </div>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
                 <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: 'var(--skybank-text-secondary)' }}>
-                    No audit logs found.
-                  </td>
+                  <th>Time</th>
+                  <th>Event</th>
+                  <th>Result</th>
+                  <th>Details</th>
                 </tr>
-              ) : logs.map(log => (
-                <tr key={log.id}>
-                  <td data-label="Timestamp" style={{ fontSize: '0.75rem', color: 'var(--skybank-text-secondary)' }}>
-                    {new Date(log.timestamp).toLocaleString()}
-                  </td>
-                  <td data-label="Event Type" style={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600 }}>
-                    {log.event_type}
-                  </td>
-                  <td data-label="Result">
-                    <span className={`status-badge ${log.result === 'SUCCESS' ? 'status-success' : 'status-error'}`}>
-                      {log.result}
-                    </span>
-                  </td>
-                  <td data-label="Details" style={{ fontSize: '0.875rem' }}>
-                    {log.details}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </DashboardLayout>
+              </thead>
+              <tbody>
+                {logs.map(log => (
+                  <tr key={log.id}>
+                    <td className={styles.timeCell}>{formatTime(log.timestamp)}</td>
+                    <td><span className={`${styles.event} mono`}>{log.event_type}</span></td>
+                    <td><StatusBadge status={log.result} /></td>
+                    <td className={styles.detailsCell}>{log.details}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <p className={styles.note}>
+        Showing the most recent 100 events for your account. Timestamps are recorded by the server.
+      </p>
+    </div>
   );
+}
+
+function formatTime(value: string): string {
+  // SQLite's CURRENT_TIMESTAMP is UTC without a zone marker; treat it as such.
+  const iso = /[zZ]|[+-]\d{2}:\d{2}$/.test(value) ? value : value.replace(' ', 'T') + 'Z';
+  return formatDateTime(iso);
 }

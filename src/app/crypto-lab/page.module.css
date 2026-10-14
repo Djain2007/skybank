@@ -1,0 +1,91 @@
+.page {
+  max-width: 1080px;
+}
+
+.tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+
+.explain {
+  margin-bottom: 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+.output {
+  margin-top: 18px;
+}
+
+.outputLabel {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* ---------- Primitive reference ---------- */
+
+.primitives {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.primitive {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.primitive:nth-child(odd) {
+  border-right: 1px solid var(--line);
+}
+
+.primitive:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.primitiveHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.primitiveRole {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.primitiveWhere {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+@media (max-width: 960px) {
+  .tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .primitives {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .primitive:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .primitive:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .primitive:last-child {
+    border-bottom: 0;
+  }
+}

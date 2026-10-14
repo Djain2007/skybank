@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const account = db.prepare('SELECT id FROM accounts WHERE user_id = ?').get(session.id) as any;
+    const account = db.prepare('SELECT id FROM accounts WHERE user_id = ?').get(session.id) as { id: string } | undefined;
     if (!account) {
       return NextResponse.json({ error: 'Account not found' }, { status: 404 });
     }

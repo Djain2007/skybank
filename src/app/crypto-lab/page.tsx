@@ -2,9 +2,42 @@
 
 import { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
+import PageHeader from '../components/PageHeader';
 import { arrayBufferToBase64 } from '@/lib/crypto/client';
+import styles from './page.module.css';
 
-export default function CryptoLab() {
+const primitives = [
+  {
+    name: 'AES-256-GCM',
+    role: 'Authenticated encryption',
+    where: 'Seals the transfer payload in the browser. The authentication tag detects any change to the ciphertext.',
+  },
+  {
+    name: 'RSA-OAEP',
+    role: 'Key exchange',
+    where: 'Wraps the one-time AES key with the server’s 4096-bit public key so only the server can unwrap it.',
+  },
+  {
+    name: 'RSA-PSS',
+    role: 'Digital signature',
+    where: 'Signs the canonical transaction with your private key. The server verifies it with your public key.',
+  },
+  {
+    name: 'Argon2id',
+    role: 'Password hashing',
+    where: 'Hashes passwords at registration and login with a random salt and memory-hard parameters.',
+  },
+];
+
+export default function CryptoLabPage() {
+  return (
+    <DashboardLayout>
+      <CryptoLab />
+    </DashboardLayout>
+  );
+}
+
+function CryptoLab() {
   const [hashInput, setHashInput] = useState('SkyBank Transaction Data');
   const [hashOutput, setHashOutput] = useState('');
 
@@ -33,74 +66,97 @@ export default function CryptoLab() {
   };
 
   return (
-    <DashboardLayout>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 500 }}>Cryptography Lab</h2>
-        <p style={{ color: 'var(--skybank-text-secondary)', marginBottom: '3rem' }}>
-          Interactive educational demonstrations of cryptographic primitives used in SkyBank.
-        </p>
+    <div className={styles.page}>
+      <PageHeader
+        title="Cryptography lab"
+        description="Try the primitives SkyBank is built on. Everything here runs in your browser with the Web Crypto API."
+      />
 
-        {/* SHA-256 */}
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 500 }}>1. Hashing (SHA-256)</h3>
-          <p style={{ fontSize: '0.875rem', color: 'var(--skybank-text-secondary)', marginBottom: '1.5rem' }}>
-            A cryptographic hash function maps data of arbitrary size to a fixed-size bit string.
-            It provides collision resistance, pre-image resistance, and second pre-image resistance.
-          </p>
-          <div className="form-group">
-            <label className="form-label">Input Message</label>
-            <input type="text" className="form-input" value={hashInput} onChange={e => setHashInput(e.target.value)} />
+      <div className={styles.tools}>
+        <section className="card" aria-labelledby="hash-title">
+          <div className="card-header">
+            <h2 id="hash-title" className="card-title">Hash a message</h2>
+            <span className="tag">SHA-256</span>
           </div>
-          <button onClick={handleHash} className="btn btn-secondary" style={{ marginBottom: '1.5rem', width: '100%', maxWidth: '200px' }}>Compute Hash</button>
-          
-          {hashOutput && (
-            <div className="break-all" style={{ background: '#F0F4F8', padding: '1rem', borderRadius: '6px', fontFamily: 'monospace', fontSize: '0.875rem' }}>
-              <div style={{ color: 'var(--skybank-text-secondary)', marginBottom: '0.5rem', fontWeight: 500 }}>SHA-256 (Base64)</div>
-              {hashOutput}
+          <form
+            className="card-body"
+            onSubmit={e => {
+              e.preventDefault();
+              handleHash();
+            }}
+          >
+            <p className={styles.explain}>
+              A hash maps input of any length to a fixed 256-bit digest. Change one character
+              and the whole digest changes, and there is no way back from digest to message.
+            </p>
+            <div className="field">
+              <label className="label" htmlFor="hash-input">Message</label>
+              <input id="hash-input" type="text" className="input" value={hashInput} onChange={e => setHashInput(e.target.value)} />
             </div>
-          )}
-        </div>
+            <button type="submit" className="btn btn-primary">Compute hash</button>
 
-        {/* HMAC */}
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 500 }}>2. HMAC-SHA-256</h3>
-          <p style={{ fontSize: '0.875rem', color: 'var(--skybank-text-secondary)', marginBottom: '1.5rem' }}>
-            Hash-based Message Authentication Code provides both data integrity and authenticity. Note that while SkyBank uses AES-GCM for authenticated encryption, HMAC is useful when confidentiality isn't required but integrity is.
-          </p>
-          <div className="form-group">
-            <label className="form-label">Secret Key</label>
-            <input type="text" className="form-input" value={hmacKey} onChange={e => setHmacKey(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Message</label>
-            <input type="text" className="form-input" value={hmacInput} onChange={e => setHmacInput(e.target.value)} />
-          </div>
-          <button onClick={handleHmac} className="btn btn-secondary" style={{ marginBottom: '1.5rem', width: '100%', maxWidth: '200px' }}>Compute MAC</button>
-          
-          {hmacOutput && (
-            <div className="break-all" style={{ background: '#F0F4F8', padding: '1rem', borderRadius: '6px', fontFamily: 'monospace', fontSize: '0.875rem' }}>
-              <div style={{ color: 'var(--skybank-text-secondary)', marginBottom: '0.5rem', fontWeight: 500 }}>MAC (Base64)</div>
-              {hmacOutput}
-            </div>
-          )}
-        </div>
+            <Output label="Digest (Base64)" value={hashOutput} />
+          </form>
+        </section>
 
-        {/* Note on others */}
-        <div className="card">
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 500 }}>Other Primitives</h3>
-          <div style={{ fontSize: '0.875rem', color: 'var(--skybank-text-secondary)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <strong style={{ color: 'var(--skybank-text-primary)' }}>AES-256-GCM:</strong> Used in the Transfer flow for authenticated encryption.
-            </div>
-            <div>
-              <strong style={{ color: 'var(--skybank-text-primary)' }}>RSA-OAEP & RSA-PSS:</strong> Used in the Transfer flow for secure key exchange and digital signatures.
-            </div>
-            <div>
-              <strong style={{ color: 'var(--skybank-text-primary)' }}>Argon2id:</strong> Used during Registration and Login for secure password hashing.
-            </div>
+        <section className="card" aria-labelledby="hmac-title">
+          <div className="card-header">
+            <h2 id="hmac-title" className="card-title">Authenticate a message</h2>
+            <span className="tag">HMAC-SHA-256</span>
           </div>
-        </div>
+          <form
+            className="card-body"
+            onSubmit={e => {
+              e.preventDefault();
+              handleHmac();
+            }}
+          >
+            <p className={styles.explain}>
+              A MAC proves a message came from someone who holds the key and was not altered.
+              SkyBank gets this from AES-GCM&apos;s tag, but HMAC is the tool when you need
+              integrity without confidentiality.
+            </p>
+            <div className="field">
+              <label className="label" htmlFor="hmac-key">Secret key</label>
+              <input id="hmac-key" type="text" className="input mono" value={hmacKey} onChange={e => setHmacKey(e.target.value)} />
+            </div>
+            <div className="field">
+              <label className="label" htmlFor="hmac-input">Message</label>
+              <input id="hmac-input" type="text" className="input" value={hmacInput} onChange={e => setHmacInput(e.target.value)} />
+            </div>
+            <button type="submit" className="btn btn-primary">Compute MAC</button>
+
+            <Output label="MAC (Base64)" value={hmacOutput} />
+          </form>
+        </section>
       </div>
-    </DashboardLayout>
+
+      <section className="card" aria-labelledby="primitives-title">
+        <div className="card-header">
+          <h2 id="primitives-title" className="card-title">Where each primitive is used</h2>
+        </div>
+        <div className={styles.primitives}>
+          {primitives.map(p => (
+            <div key={p.name} className={styles.primitive}>
+              <div className={styles.primitiveHead}>
+                <span className="tag">{p.name}</span>
+                <span className={styles.primitiveRole}>{p.role}</span>
+              </div>
+              <p className={styles.primitiveWhere}>{p.where}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Output({ label, value }: { label: string; value: string }) {
+  if (!value) return null;
+  return (
+    <div className={styles.output} aria-live="polite">
+      <div className={styles.outputLabel}>{label}</div>
+      <code className="code-block">{value}</code>
+    </div>
   );
 }

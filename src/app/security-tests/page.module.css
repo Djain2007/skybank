@@ -1,0 +1,126 @@
+.page {
+  max-width: 860px;
+}
+
+/* ---------- Test list ---------- */
+
+.tests {
+  margin-bottom: 20px;
+}
+
+.test {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.test:last-child {
+  border-bottom: 0;
+}
+
+.testText {
+  min-width: 0;
+  flex: 1;
+}
+
+.testName {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.testMeta {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  gap: 4px 16px;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.testMeta > div {
+  display: contents;
+}
+
+.testMeta dt {
+  color: var(--slate);
+}
+
+.testMeta dd {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.test :global(.btn) {
+  flex: none;
+  min-width: 118px;
+}
+
+/* ---------- Output ---------- */
+
+.console {
+  margin-bottom: 20px;
+}
+
+.consoleBody {
+  padding: 16px 20px 20px;
+}
+
+.consoleStatus {
+  font-size: 13.5px;
+  color: var(--slate);
+}
+
+.consoleResult {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+}
+
+.consoleOk {
+  color: var(--green);
+  background: var(--green-tint);
+  border-color: rgba(27, 127, 78, 0.18);
+}
+
+.consoleBad {
+  color: var(--red);
+  background: var(--red-tint);
+  border-color: rgba(194, 59, 59, 0.18);
+}
+
+.note {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--slate);
+  max-width: 64ch;
+}
+
+@media (max-width: 640px) {
+  .test {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .testMeta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .testMeta dd {
+    margin-bottom: 8px;
+  }
+
+  .test :global(.btn) {
+    width: 100%;
+  }
+}

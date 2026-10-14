@@ -34,7 +34,9 @@ export async function getSession() {
     WHERE sessions.id = ?
   `);
   
-  const session = getStmt.get(sessionToken) as any;
+  const session = getStmt.get(sessionToken) as
+    | { id: string; username: string; full_name: string; public_key: string; expires_at: string }
+    | undefined;
   if (!session) return null;
 
   if (new Date(session.expires_at) < new Date()) {

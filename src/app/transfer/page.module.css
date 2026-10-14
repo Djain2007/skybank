@@ -1,0 +1,265 @@
+.page {
+  max-width: 640px;
+}
+
+/* ---------- Stepper: this content is a sequence, so it is numbered ---------- */
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.stepItem + .stepItem::before {
+  content: "";
+  order: -1;
+  width: 24px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.stepDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--slate);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+}
+
+.stepItem[data-state="current"] {
+  color: var(--ink);
+}
+
+.stepItem[data-state="current"] .stepDot {
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.stepItem[data-state="done"] {
+  color: var(--ink-2);
+}
+
+.stepItem[data-state="done"] .stepDot {
+  color: var(--blue);
+  background: var(--blue-tint);
+  border-color: transparent;
+}
+
+.alert {
+  margin-bottom: 16px;
+}
+
+/* ---------- Details form ---------- */
+
+.fromBlock {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+}
+
+.fromLabel {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--slate);
+  margin-bottom: 4px;
+}
+
+.fromRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.fromBalance {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--slate);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* ---------- Review and receipt ---------- */
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.summary {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 0;
+  font-size: 14.5px;
+  border-bottom: 1px solid var(--line);
+}
+
+.summaryRow dt {
+  color: var(--slate);
+  flex: none;
+}
+
+.summaryRow dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.summaryAmount {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.reviewNote {
+  margin: 16px 0 20px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--slate);
+}
+
+.keyWait {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -8px 0 20px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* ---------- Verification timeline ---------- */
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.timelineItem + .timelineItem::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: -8px;
+  width: 1px;
+  height: 16px;
+  background: var(--line-strong);
+}
+
+.timelineMarker {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--purple);
+  background: var(--purple-tint);
+}
+
+.timelineItem[data-state="active"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.timelineItem[data-state="active"] .timelineMarker {
+  background: transparent;
+}
+
+.successHead {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.successIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--green);
+  background: var(--green-tint);
+  border-radius: 50%;
+}
+
+.sentAmount {
+  margin-bottom: 18px;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  .stepLabel {
+    display: none;
+  }
+
+  .stepItem[data-state="current"] .stepLabel {
+    display: inline;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .actions :global(.btn) {
+    width: 100%;
+  }
+}

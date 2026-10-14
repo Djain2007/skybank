@@ -1,0 +1,155 @@
+.frame {
+  display: grid;
+  grid-template-columns: minmax(360px, 46%) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---------- Left panel ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  padding: 40px 56px;
+  color: #fff;
+  background: var(--blue-deep);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  align-self: flex-start;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.panelBody {
+  max-width: 440px;
+}
+
+.panelTitle {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.panelLead {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 36px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stepIndex {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--purple);
+  border-radius: 7px;
+}
+
+.stepTitle {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.stepDetail {
+  margin-top: 3px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.panelFoot {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 440px;
+}
+
+/* ---------- Right content ---------- */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 56px;
+  background: var(--canvas);
+}
+
+.mobileBrand {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 32px;
+}
+
+.form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .frame {
+    grid-template-columns: minmax(320px, 42%) minmax(0, 1fr);
+  }
+
+  .panel,
+  .content {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 840px) {
+  .frame {
+    display: block;
+  }
+
+  .panel {
+    display: none;
+  }
+
+  .content {
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding: 28px 20px 48px;
+  }
+
+  .mobileBrand {
+    display: flex;
+  }
+
+  .form {
+    margin: 0;
+  }
+}

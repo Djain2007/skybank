@@ -1,73 +1,116 @@
 'use client';
 
-import DashboardLayout from './components/DashboardLayout';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import DashboardLayout from './components/DashboardLayout';
+import PageHeader from './components/PageHeader';
+import TransactionTable from './components/TransactionTable';
+import { useSession } from './components/Session';
+import type { Transaction } from '@/lib/types';
+import { formatAmount } from '@/lib/format';
+import styles from './page.module.css';
+
+const protections = [
+  { label: 'Transfer payload', value: 'AES-256-GCM' },
+  { label: 'Key exchange', value: 'RSA-OAEP 4096' },
+  { label: 'Signatures', value: 'RSA-PSS 4096' },
+  { label: 'Passwords', value: 'Argon2id' },
+  { label: 'Replay protection', value: 'Nonce + timestamp' },
+];
 
 export default function Dashboard() {
-  const [data, setData] = useState<any>(null);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(d => {
-        if (!d.error) setData(d);
-      });
-  }, []);
-
-  if (!data) return <DashboardLayout><div style={{ padding: '2rem' }}>Loading overview...</div></DashboardLayout>;
-
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 500 }}>
-          Welcome back, {data.user.fullName.split(' ')[0]}
-        </h2>
-        <p style={{ color: 'var(--skybank-text-secondary)', marginBottom: '3rem' }}>
-          Here is your financial overview.
-        </p>
+      <Overview />
+    </DashboardLayout>
+  );
+}
 
-        <div className="card" style={{ marginBottom: '3rem' }}>
-          <h3 style={{ fontSize: '1rem', color: 'var(--skybank-text-secondary)', fontWeight: 500, marginBottom: '1rem' }}>
-            Primary Account
-          </h3>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
-            <div>
-              <div style={{ fontSize: '3rem', color: 'var(--skybank-navy)', fontWeight: 600, lineHeight: 1 }}>
-                {data.account.balance.toLocaleString()} <span style={{ fontSize: '1.5rem', fontWeight: 500 }}>SKY</span>
+function Overview() {
+  const { session } = useSession();
+  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+
+  useEffect(() => {
+    fetch('/api/transactions')
+      .then(res => res.json())
+      .then(data => setTransactions(data.transactions ?? []))
+      .catch(() => setTransactions([]));
+  }, []);
+
+  const firstName = session.user.fullName.split(' ')[0];
+  const recent = transactions?.slice(0, 5) ?? [];
+
+  return (
+    <div className={styles.page}>
+      <PageHeader
+        title={`Welcome back, ${firstName}`}
+        description="Here is where your account stands."
+      />
+
+      <div className={styles.grid}>
+        <div className={styles.primary}>
+          <section className={styles.balanceCard} aria-labelledby="balance-label">
+            <div className={styles.balanceTop}>
+              <span id="balance-label" className={styles.balanceLabel}>Available balance</span>
+              <span className={styles.balanceMeta}>Primary account</span>
+            </div>
+            <div className={`${styles.balanceAmount} num`}>
+              {formatAmount(session.account.balance)}
+              <span className={styles.balanceUnit}>SKY</span>
+            </div>
+            <div className={styles.balanceBottom}>
+              <div>
+                <div className={styles.balanceMeta}>Account number</div>
+                <div className={`${styles.accountNumber} mono`}>{session.account.accountNumber}</div>
               </div>
-              <div style={{ marginTop: '0.5rem', fontFamily: 'monospace', color: 'var(--skybank-text-secondary)' }}>
-                Account: {data.account.accountNumber}
+              <div className={styles.balanceActions}>
+                <Link href="/transfer" className="btn btn-on-dark">Transfer funds</Link>
+                <Link href="/transactions" className="btn btn-on-dark-ghost">All transactions</Link>
               </div>
             </div>
-            <a href="/transfer" className="btn btn-primary" style={{ minWidth: '160px' }}>
-              Transfer Funds
-            </a>
-          </div>
+          </section>
+
+          <section className="card" aria-labelledby="recent-title">
+            <div className="card-header">
+              <h2 id="recent-title" className="card-title">Recent transactions</h2>
+              {recent.length > 0 && <Link href="/transactions" className={styles.cardLink}>View all</Link>}
+            </div>
+
+            {transactions === null ? (
+              <div className={styles.loadingRows} aria-busy="true">
+                {[0, 1, 2].map(i => <span key={i} className="skeleton" style={{ height: 14 }} />)}
+              </div>
+            ) : recent.length === 0 ? (
+              <div className="table-empty">
+                No transactions yet. <Link href="/transfer">Send your first transfer</Link> and it
+                will show up here, along with its cryptographic record.
+              </div>
+            ) : (
+              <TransactionTable transactions={recent} mine={session.account.accountNumber} />
+            )}
+          </section>
         </div>
 
-        <div>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 500 }}>Recent Transactions</h3>
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            <table className="responsive-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: 'var(--skybank-text-secondary)' }}>
-                    No recent transactions. View all in the Transactions tab.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <aside className={styles.secondary}>
+          <section className="card" aria-labelledby="protection-title">
+            <div className="card-header">
+              <h2 id="protection-title" className="card-title">How this account is protected</h2>
+            </div>
+            <dl className={styles.protections}>
+              {protections.map(item => (
+                <div key={item.label} className={styles.protectionRow}>
+                  <dt>{item.label}</dt>
+                  <dd className="tag">{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className={styles.cardFoot}>
+              Try the primitives yourself in the <Link href="/crypto-lab">cryptography lab</Link>, or
+              attack a transfer in <Link href="/security-tests">security tests</Link>.
+            </div>
+          </section>
+        </aside>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

@@ -1,0 +1,134 @@
+/* ---------- Shared ---------- */
+
+.date {
+  white-space: nowrap;
+  color: var(--slate);
+}
+
+.description {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.counterparty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.directionLabel {
+  font-size: 13px;
+  color: var(--slate);
+}
+
+.direction {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.sent {
+  color: var(--ink-2);
+  background: var(--canvas);
+}
+
+.received {
+  color: var(--green);
+  background: var(--green-tint);
+}
+
+.self {
+  color: var(--slate);
+  background: var(--canvas);
+}
+
+.amount {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.amountIn {
+  color: var(--green);
+}
+
+/* ---------- Phone list (hidden on wide screens) ---------- */
+
+.list {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.item .direction {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.itemClickable {
+  cursor: pointer;
+}
+
+.itemSelected {
+  background: var(--blue-tint);
+}
+
+.itemText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.itemTitle {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemMeta {
+  display: flex;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--slate);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.itemDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 720px) {
+  .table {
+    display: none;
+  }
+
+  .list {
+    display: block;
+  }
+}

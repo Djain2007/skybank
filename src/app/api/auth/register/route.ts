@@ -19,14 +19,15 @@ export async function POST(request: Request) {
     // Generate unique user and account IDs
     const userId = crypto.randomUUID();
     const accountId = crypto.randomUUID();
-    // Demo accounts assignment
+    // Demo accounts: registering as one of these usernames gives a fixed account
+    // number and balance so the README walkthrough works out of the box.
     let accountNumber = 'SKY-' + crypto.randomInt(10000, 99999).toString();
     let defaultBalance = 50000;
-    
-    if (username.toLowerCase() === 'alice') {
+
+    if (username.toLowerCase() === 'daksh') {
       accountNumber = 'SKY-10001';
       defaultBalance = 50000;
-    } else if (username.toLowerCase() === 'bob') {
+    } else if (username.toLowerCase() === 'jash') {
       accountNumber = 'SKY-10002';
       defaultBalance = 20000;
     }
@@ -60,8 +61,8 @@ export async function POST(request: Request) {
     `).run(auditId, 'REGISTER_SUCCESS', userId, 'SUCCESS', 'New user registered');
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    if (err.message.includes('UNIQUE constraint failed')) {
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('UNIQUE constraint failed')) {
       return NextResponse.json({ error: 'Username or email already exists' }, { status: 400 });
     }
     console.error(err);

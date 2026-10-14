@@ -13,7 +13,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username) as any;
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username) as
+      | { id: string; password_hash: string; public_key: string }
+      | undefined;
 
     if (!user) {
       // Create audit log for failed login
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
     `).run(auditId, 'LOGIN_SUCCESS', user.id, 'SUCCESS', 'User logged in securely');
 
     return NextResponse.json({ success: true, publicKey: user.public_key });
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

@@ -39,16 +39,16 @@ export async function POST(request: Request) {
     let aesKeyBuffer: Buffer;
     try {
       aesKeyBuffer = decryptAESKey(encryptedAesKey, privateKey);
-    } catch (err) {
+    } catch {
       logSecurityEvent('TRANSACTION_REJECTED', session.id, 'Failed to decrypt AES key');
       return NextResponse.json({ error: 'Cryptographic failure (Key Decryption)' }, { status: 400 });
     }
 
-    // 2. Decrypt the transaction payload and verify auth tag (AES-GCM)
-    let decryptedPayload: string;
+    // 2. Decrypt the transaction payload and verify auth tag (AES-GCM).
+    // Decryption throws if the authentication tag does not match, which is the check itself.
     try {
-      decryptedPayload = decryptTransaction(ciphertext, aesKeyBuffer, aesNonce, authTag);
-    } catch (err) {
+      decryptTransaction(ciphertext, aesKeyBuffer, aesNonce, authTag);
+    } catch {
       logSecurityEvent('TRANSACTION_REJECTED', session.id, 'AES-GCM Authentication failed (Tampering detected)');
       return NextResponse.json({ error: 'Cryptographic failure (AES-GCM Authentication)' }, { status: 400 });
     }
@@ -90,7 +90,9 @@ export async function POST(request: Request) {
     }
 
     // 5. Validate sender account ownership and balance
-    const sender = db.prepare('SELECT id, balance FROM accounts WHERE account_number = ? AND user_id = ?').get(senderAccount, session.id) as any;
+    const sender = db.prepare('SELECT id, balance FROM accounts WHERE account_number = ? AND user_id = ?').get(senderAccount, session.id) as
+      | { id: string; balance: number }
+      | undefined;
     if (!sender) {
       logSecurityEvent('TRANSACTION_REJECTED', session.id, 'Invalid sender account');
       return NextResponse.json({ error: 'Invalid sender account' }, { status: 400 });
@@ -102,7 +104,7 @@ export async function POST(request: Request) {
     }
 
     // 6. Validate recipient account
-    const recipient = db.prepare('SELECT id FROM accounts WHERE account_number = ?').get(recipientAccount) as any;
+    const recipient = db.prepare('SELECT id FROM accounts WHERE account_number = ?').get(recipientAccount) as { id: string } | undefined;
     if (!recipient) {
       logSecurityEvent('TRANSACTION_REJECTED', session.id, 'Invalid recipient account');
       return NextResponse.json({ error: 'Invalid recipient account' }, { status: 400 });
@@ -137,7 +139,7 @@ export async function POST(request: Request) {
       });
 
       dbTx(); // Execute atomic transaction
-    } catch (dbErr: any) {
+    } catch (dbErr) {
       console.error(dbErr);
       logSecurityEvent('TRANSACTION_FAILED', session.id, 'Database transaction failed');
       return NextResponse.json({ error: 'Failed to process transaction' }, { status: 500 });
@@ -145,7 +147,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, transactionId });
 
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

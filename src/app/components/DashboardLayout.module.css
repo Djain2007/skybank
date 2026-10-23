@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
+  background: var(--canvas);
 }
 
 .column {
@@ -10,21 +11,21 @@
   flex-direction: column;
 }
 
-/* ---------- Sidebar (desktop) and drawer (mobile) share this content ---------- */
-
-.sidebar,
-.drawer {
-  display: flex;
-  flex-direction: column;
-  background: var(--paper);
-}
+/* ---------- Sidebar ---------- */
 
 .sidebar {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+  background: var(--paper);
   border-right: 1px solid var(--line);
+  z-index: 20;
+}
+
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .brand {
@@ -32,14 +33,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 20px 20px 14px;
+  padding: 24px 20px 16px;
 }
 
 .brandLink {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: inherit;
+  text-decoration: none;
 }
 
 .brandLink:hover {
@@ -49,13 +51,32 @@
 .brandText {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badgeSim {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  color: var(--blue);
+  background: var(--blue-tint);
+  border-radius: 4px;
+  line-height: 1;
 }
 
 .brandSub {
-  font-size: 12px;
-  line-height: 1;
+  font-size: 11.5px;
+  line-height: 1.2;
   color: var(--slate);
+  font-weight: 400;
 }
 
 .drawerClose {
@@ -66,80 +87,109 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 10px 12px 16px;
+  gap: 20px;
+  padding: 12px 14px 16px;
+  overflow-y: auto;
 }
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .groupLabel {
   padding: 0 10px 8px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 36px;
-  padding: 0 10px;
-  font-size: 14px;
+  gap: 11px;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--ink-2);
   border-radius: var(--radius-control);
-  transition: background-color 120ms ease, color 120ms ease;
+  transition: all 130ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  position: relative;
 }
 
-.item svg {
-  color: var(--muted);
-  flex: none;
+.itemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--slate);
+  transition: color 130ms ease;
+}
+
+.itemLabel {
+  flex: 1;
 }
 
 .item:hover {
-  background: var(--canvas);
+  background: #f1f5f9;
   color: var(--ink);
   text-decoration: none;
 }
 
-.item:hover svg {
-  color: var(--ink-2);
+.item:hover .itemIcon {
+  color: var(--ink);
 }
 
 .itemActive,
 .itemActive:hover {
   background: var(--blue-tint);
   color: var(--blue);
+  font-weight: 600;
 }
 
-.itemActive svg,
-.itemActive:hover svg {
+.itemActive .itemIcon,
+.itemActive:hover .itemIcon {
   color: var(--blue);
 }
 
-/* The security group is the cryptographic layer, so its active state is purple. */
+/* Security Group - Cryptographic tone styling */
 .group[data-tone="security"] .itemActive,
 .group[data-tone="security"] .itemActive:hover {
   background: var(--purple-tint);
   color: var(--purple);
+  font-weight: 600;
 }
 
-.group[data-tone="security"] .itemActive svg,
-.group[data-tone="security"] .itemActive:hover svg {
+.group[data-tone="security"] .itemActive .itemIcon,
+.group[data-tone="security"] .itemActive:hover .itemIcon {
   color: var(--purple);
+}
+
+.cryptoPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 14px 14px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--purple);
+  background: var(--purple-tint);
+  border: 1px solid rgba(99, 67, 216, 0.14);
+  border-radius: var(--radius-badge);
 }
 
 .user {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 14px 14px 18px;
+  gap: 12px;
+  padding: 16px 18px;
   border-top: 1px solid var(--line);
+  background: #f8fafc;
 }
 
 .avatar {
@@ -147,12 +197,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  font-size: 12.5px;
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--blue);
   background: var(--blue-tint);
+  border: 1px solid rgba(37, 84, 215, 0.16);
   border-radius: 50%;
 }
 
@@ -162,43 +213,50 @@
 }
 
 .userName {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.userAccountRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
 .userAccount {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--slate);
 }
 
-/* ---------- Main area ---------- */
+.logoutBtn {
+  color: var(--muted);
+}
+
+.logoutBtn:hover {
+  color: var(--red);
+  background: var(--red-tint);
+}
+
+/* ---------- Main Content Area ---------- */
 
 .topbar {
   display: none;
 }
 
-.topbarBrand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: inherit;
-}
-
-.topbarBrand:hover {
-  text-decoration: none;
-}
-
 .main {
   flex: 1;
-  padding: 40px 48px 72px;
+  padding: 36px 44px 72px;
   min-width: 0;
 }
 
-/* ---------- Mobile drawer ---------- */
+.bottomNav {
+  display: none;
+}
 
 .overlay {
   display: none;
@@ -208,15 +266,19 @@
   display: none;
 }
 
+/* ---------- Responsive Breakpoints ---------- */
+
 @media (max-width: 899px) {
   .shell {
     display: block;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 12px));
   }
 
   .sidebar {
     display: none;
   }
 
+  /* Mobile Top Bar */
   .topbar {
     position: sticky;
     top: 0;
@@ -224,48 +286,157 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 56px;
-    padding: 0 10px 0 16px;
-    background: var(--paper);
+    height: 60px;
+    padding: 0 16px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  }
+
+  .topbarBrand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .topbarBrand:hover {
+    text-decoration: none;
+  }
+
+  .brandTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbarActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .avatarSm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    background: var(--blue-tint);
+    border-radius: 50%;
+  }
+
+  .menuTrigger {
+    color: var(--ink);
   }
 
   .main {
-    padding: 24px 16px 56px;
+    padding: 20px 16px 48px;
   }
 
+  /* Mobile Bottom Navigation Bar */
+  .bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.05);
+  }
+
+  .bottomNavItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+    color: var(--slate);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 120ms ease;
+    padding: 6px 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .bottomNavItem:hover {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .bottomNavActive {
+    color: var(--blue) !important;
+    font-weight: 600;
+  }
+
+  .bottomNavLabel {
+    line-height: 1;
+  }
+
+  /* Off-canvas Drawer */
   .overlay {
     display: block;
     position: fixed;
     inset: 0;
-    z-index: 40;
-    background: rgba(17, 23, 58, 0.45);
-    border: 0;
+    z-index: 45;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     cursor: default;
+    animation: fadeIn 180ms ease forwards;
   }
 
   .drawer {
     display: flex;
+    flex-direction: column;
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     z-index: 50;
-    width: min(300px, 86vw);
+    width: min(320px, 86vw);
+    background: var(--paper);
     overflow-y: auto;
     box-shadow: var(--shadow-float);
     transform: translateX(-100%);
     visibility: hidden;
-    transition: transform 220ms ease, visibility 0s linear 220ms;
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 240ms;
   }
 
   .drawerOpen {
     transform: translateX(0);
     visibility: visible;
-    transition: transform 220ms ease;
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .drawer .drawerClose {
     display: inline-flex;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

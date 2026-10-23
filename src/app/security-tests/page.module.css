@@ -1,126 +1,194 @@
 .page {
-  max-width: 860px;
+  max-width: 960px;
 }
 
-/* ---------- Test list ---------- */
+/* ---------- Test Cards Grid ---------- */
 
-.tests {
-  margin-bottom: 20px;
+.testsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.test {
+.testCard {
+  padding: 20px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  transition: all 140ms ease;
+}
+
+.testCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+}
+
+.testCardTop {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.test:last-child {
-  border-bottom: 0;
-}
-
-.testText {
-  min-width: 0;
-  flex: 1;
+.categoryBadge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--amber);
+  background: var(--amber-tint);
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
 .testName {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 14px;
 }
 
-.testMeta {
-  display: grid;
-  grid-template-columns: 124px minmax(0, 1fr);
-  gap: 4px 16px;
-  margin: 0;
-  font-size: 13.5px;
+.attackMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
   line-height: 1.5;
+  margin-top: auto;
 }
 
-.testMeta > div {
-  display: contents;
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.testMeta dt {
-  color: var(--slate);
+.dtAttack {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.testMeta dd {
+.ddAttack {
   margin: 0;
   color: var(--ink-2);
 }
 
-.test :global(.btn) {
-  flex: none;
-  min-width: 118px;
+.dtDefence {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* ---------- Output ---------- */
+.ddDefence {
+  margin: 0;
+  color: var(--slate);
+}
 
-.console {
+/* ---------- Console Card ---------- */
+
+.consoleCard {
   margin-bottom: 20px;
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #1e293b;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.25);
+}
+
+.consoleCard :global(.card-header) {
+  background: #0f172a;
+  border-bottom-color: #1e293b;
+  color: #ffffff;
+}
+
+.consoleCard :global(.card-title) {
+  color: #ffffff;
+}
+
+.consoleHead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--blue);
+}
+
+.consoleHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .consoleBody {
-  padding: 16px 20px 20px;
+  padding: 20px;
 }
 
 .consoleStatus {
-  font-size: 13.5px;
-  color: var(--slate);
+  font-size: 13px;
+  color: #94a3b8;
+  font-family: var(--font-mono), monospace;
+}
+
+.consolePlaceholder {
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: #64748b;
+  font-family: var(--font-mono), monospace;
 }
 
 .consoleResult {
-  margin: 12px 0 0;
-  padding: 12px 14px;
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12.5px;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  margin-top: 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-control);
-  border: 1px solid transparent;
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resultPrefix {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.resultMsg {
+  word-break: break-all;
 }
 
 .consoleOk {
-  color: var(--green);
-  background: var(--green-tint);
-  border-color: rgba(27, 127, 78, 0.18);
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.25);
 }
 
 .consoleBad {
-  color: var(--red);
-  background: var(--red-tint);
-  border-color: rgba(194, 59, 59, 0.18);
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.25);
 }
 
-.note {
-  font-size: 13.5px;
-  line-height: 1.55;
+.footNote {
+  font-size: 13px;
   color: var(--slate);
-  max-width: 64ch;
+  line-height: 1.55;
 }
 
-@media (max-width: 640px) {
-  .test {
-    flex-direction: column;
-    gap: 14px;
-  }
+.footLink {
+  color: var(--blue);
+  font-weight: 600;
+}
 
-  .testMeta {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
-  }
-
-  .testMeta dd {
-    margin-bottom: 8px;
-  }
-
-  .test :global(.btn) {
-    width: 100%;
+@media (max-width: 800px) {
+  .testsGrid {
+    grid-template-columns: 1fr;
   }
 }

@@ -8,18 +8,17 @@ import styles from "./TransactionTable.module.css";
 
 interface TransactionTableProps {
   transactions: Transaction[];
-  /** The viewer's account number, used to decide whether a row was sent or received. */
   mine: string;
   selectedId?: string | null;
-  /** When provided, rows are selectable. */
   onSelect?: (transaction: Transaction) => void;
 }
 
-/**
- * Lists transactions as a table on wide screens and as a bank-statement style
- * list on phones, where a five-column table would scroll sideways.
- */
-export default function TransactionTable({ transactions, mine, selectedId, onSelect }: TransactionTableProps) {
+export default function TransactionTable({
+  transactions,
+  mine,
+  selectedId,
+  onSelect,
+}: TransactionTableProps) {
   const selectable = Boolean(onSelect);
 
   const rowProps = (tx: Transaction) =>
@@ -33,13 +32,15 @@ export default function TransactionTable({ transactions, mine, selectedId, onSel
             }
           },
           tabIndex: 0,
+          role: "button",
           "aria-selected": selectedId === tx.id,
         }
       : {};
 
   return (
     <>
-      <div className={`table-wrap ${styles.table}`}>
+      {/* Desktop Wide Table */}
+      <div className={`table-wrap ${styles.tableWrap}`}>
         <table className="table">
           <thead>
             <tr>
@@ -54,20 +55,27 @@ export default function TransactionTable({ transactions, mine, selectedId, onSel
             {transactions.map((tx) => {
               const sent = tx.sender_number === mine;
               const self = tx.sender_number === tx.recipient_number;
+              const isSelected = selectedId === tx.id;
               return (
                 <tr
                   key={tx.id}
-                  className={`${selectable ? "is-clickable" : ""} ${selectedId === tx.id ? "is-selected" : ""}`}
+                  className={`${selectable ? "is-clickable" : ""} ${isSelected ? "is-selected" : ""}`}
                   {...rowProps(tx)}
                 >
-                  <td className={styles.date}>{formatShortDate(tx.timestamp)}</td>
+                  <td className={styles.dateCell}>{formatShortDate(tx.timestamp)}</td>
                   <td>
                     <Counterparty tx={tx} sent={sent} self={self} />
                   </td>
-                  <td className={styles.description}>
-                    {tx.description || <span className="text-secondary">No description</span>}
+                  <td className={styles.descriptionCell}>
+                    {tx.description ? (
+                      <span className={styles.descText}>{tx.description}</span>
+                    ) : (
+                      <span className="text-secondary" style={{ fontStyle: "italic", fontSize: 13 }}>
+                        No description
+                      </span>
+                    )}
                   </td>
-                  <td className={`cell-right num ${styles.amount} ${!sent && !self ? styles.amountIn : ""}`}>
+                  <td className={`cell-right num ${styles.amountCell} ${!sent && !self ? styles.amountIn : ""}`}>
                     <Amount tx={tx} sent={sent} self={self} />
                   </td>
                   <td>
@@ -80,30 +88,45 @@ export default function TransactionTable({ transactions, mine, selectedId, onSel
         </table>
       </div>
 
-      <ul className={styles.list}>
+      {/* Mobile Card / Feed List (Strictly prevents horizontal scrolling on phones) */}
+      <ul className={styles.mobileList} aria-label="Transactions list">
         {transactions.map((tx) => {
           const sent = tx.sender_number === mine;
           const self = tx.sender_number === tx.recipient_number;
+          const isSelected = selectedId === tx.id;
           return (
             <li
               key={tx.id}
-              className={`${styles.item} ${selectable ? styles.itemClickable : ""} ${selectedId === tx.id ? styles.itemSelected : ""}`}
+              className={`${styles.mobileItem} ${selectable ? styles.mobileItemClickable : ""} ${
+                isSelected ? styles.mobileItemSelected : ""
+              }`}
               {...rowProps(tx)}
             >
-              <DirectionIcon sent={sent} self={self} size={15} />
-              <span className={styles.itemText}>
-                <span className={styles.itemTitle}>
-                  <span className={styles.directionLabel}>{self ? "To yourself" : sent ? "To" : "From"}</span>{" "}
-                  {!self && <span className="mono">{sent ? tx.recipient_number : tx.sender_number}</span>}
+              <div className={styles.mobileLeft}>
+                <DirectionIcon sent={sent} self={self} size={16} />
+                <div className={styles.mobileDetails}>
+                  <div className={styles.mobileTitle}>
+                    <span className={styles.directionLabel}>{self ? "Self Transfer" : sent ? "To" : "From"}</span>{" "}
+                    {!self && <span className="mono">{sent ? tx.recipient_number : tx.sender_number}</span>}
+                  </div>
+                  <div className={styles.mobileMeta}>
+                    <span>{formatShortDate(tx.timestamp)}</span>
+                    {tx.description && (
+                      <>
+                        <span className={styles.dotSeparator}>•</span>
+                        <span className={styles.mobileDesc}>{tx.description}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.mobileRight}>
+                <span className={`num ${styles.amountCell} ${!sent && !self ? styles.amountIn : ""}`}>
+                  <Amount tx={tx} sent={sent} self={self} />
                 </span>
-                <span className={styles.itemMeta}>
-                  <span>{formatShortDate(tx.timestamp)}</span>
-                  {tx.description && <span className={styles.itemDescription}>{tx.description}</span>}
-                </span>
-              </span>
-              <span className={`num ${styles.amount} ${!sent && !self ? styles.amountIn : ""}`}>
-                <Amount tx={tx} sent={sent} self={self} />
-              </span>
+                <StatusBadge status={tx.status} />
+              </div>
             </li>
           );
         })}
@@ -133,7 +156,6 @@ function Counterparty({ tx, sent, self }: { tx: Transaction; sent: boolean; self
   );
 }
 
-/** Sent amounts carry a minus sign, received a plus; a transfer to yourself nets to zero and carries neither. */
 function Amount({ tx, sent, self }: { tx: Transaction; sent: boolean; self: boolean }) {
   const sign = self ? "" : sent ? "\u2212" : "+";
   return (

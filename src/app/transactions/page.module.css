@@ -2,6 +2,117 @@
   max-width: 1180px;
 }
 
+/* ---------- Filter & Search Bar ---------- */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterPills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--slate);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 130ms ease;
+}
+
+.filterPill:hover {
+  color: var(--ink);
+  border-color: #cbd5e1;
+}
+
+.filterPillActive {
+  color: var(--blue) !important;
+  background: var(--blue-tint) !important;
+  border-color: rgba(37, 84, 215, 0.25) !important;
+  font-weight: 600;
+}
+
+.pillCount {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 9999px;
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  flex: 1;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 38px;
+  padding: 0 32px 0 34px;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: var(--focus-ring);
+}
+
+.clearSearch {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.clearSearch:hover {
+  color: var(--ink);
+}
+
+/* ---------- Layout Grid ---------- */
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -10,7 +121,7 @@
 }
 
 .hasInspector {
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 390px;
 }
 
 .list {
@@ -20,33 +131,74 @@
 .loadingRows {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 22px 20px;
+  gap: 12px;
+  padding: 20px;
 }
 
-/* ---------- Inspector ---------- */
+/* ---------- Inspector (Desktop Sticky) ---------- */
+
+.sheetBackdrop {
+  display: none;
+}
+
+.sheetHandle {
+  display: none;
+}
 
 .inspector {
   position: sticky;
   top: 24px;
   min-width: 0;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 
-.inspectorKicker {
-  font-size: 12.5px;
-  font-weight: 500;
+.inspectorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+}
+
+.inspectorHeadLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.directionTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--slate);
 }
 
 .inspectorAmount {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  margin-top: 2px;
+  color: var(--ink);
+}
+
+.closeInspectorBtn {
+  margin-top: -4px;
+  margin-right: -4px;
+}
+
+.inspectorBody {
+  padding: 20px;
 }
 
 .facts {
-  margin: 0 0 22px;
+  margin: 0 0 20px;
   display: flex;
   flex-direction: column;
 }
@@ -54,9 +206,9 @@
 .fact {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  padding: 9px 0;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
   font-size: 13.5px;
   border-bottom: 1px solid var(--line);
 }
@@ -68,6 +220,7 @@
 .fact dt {
   color: var(--slate);
   flex: none;
+  font-size: 13px;
 }
 
 .fact dd {
@@ -75,6 +228,28 @@
   font-weight: 500;
   text-align: right;
   overflow-wrap: anywhere;
+}
+
+.factDdRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Cryptographic Envelope Section ---------- */
+
+.envelopeCard {
+  padding: 16px;
+  background: var(--purple-tint);
+  border: 1px solid rgba(99, 67, 216, 0.16);
+  border-radius: var(--radius-control);
+}
+
+.envelopeHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--purple);
 }
 
 .envelopeTitle {
@@ -85,9 +260,9 @@
 
 .envelopeLead {
   margin: 4px 0 16px;
-  font-size: 13px;
+  font-size: 12.5px;
   line-height: 1.5;
-  color: var(--slate);
+  color: var(--ink-2);
 }
 
 .algos {
@@ -96,8 +271,9 @@
   gap: 8px;
   margin-bottom: 18px;
   padding: 12px 14px;
-  background: var(--purple-tint);
-  border-radius: var(--radius-control);
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(99, 67, 216, 0.12);
 }
 
 .algo {
@@ -105,12 +281,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: var(--ink-2);
-}
-
-.algo :global(.tag) {
-  background: var(--paper);
 }
 
 .field {
@@ -121,40 +293,114 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 6px;
 }
 
+.fieldTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .fieldLabel {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .fieldNote {
-  margin-top: 5px;
-  font-size: 12px;
-  color: var(--muted);
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--slate);
 }
 
-.replay {
+.replayBadge {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 16px;
   padding-top: 14px;
-  font-size: 13.5px;
-  color: var(--ink-2);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(99, 67, 216, 0.15);
 }
 
-@media (max-width: 1100px) {
+.replayLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ---------- Mobile Responsive Bottom Sheet ---------- */
+
+@media (max-width: 1024px) {
   .hasInspector {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* When inspector is active on tablet/phone, make it a true modal bottom sheet */
+  .sheetBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 180ms ease forwards;
+  }
+
+  .sheetHandle {
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 9999px;
+    margin: 10px auto 4px;
+  }
+
   .inspector {
-    position: static;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    z-index: 55;
+    max-height: 86vh;
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--line);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+    animation: slideSheet 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .filterBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+@keyframes slideSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

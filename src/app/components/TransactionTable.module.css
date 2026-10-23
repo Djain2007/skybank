@@ -1,26 +1,36 @@
-/* ---------- Shared ---------- */
+/* ---------- Shared Table Styles ---------- */
 
-.date {
-  white-space: nowrap;
-  color: var(--slate);
+.tableWrap {
+  border-radius: inherit;
 }
 
-.description {
-  max-width: 220px;
+.dateCell {
+  white-space: nowrap;
+  color: var(--slate);
+  font-size: 13px;
+}
+
+.descriptionCell {
+  max-width: 260px;
+}
+
+.descText {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--ink-2);
 }
 
 .counterparty {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   white-space: nowrap;
 }
 
 .directionLabel {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--slate);
 }
 
@@ -29,106 +39,141 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
 }
 
 .sent {
   color: var(--ink-2);
-  background: var(--canvas);
+  background: #f1f5f9;
+  border: 1px solid var(--line);
 }
 
 .received {
   color: var(--green);
   background: var(--green-tint);
+  border: 1px solid rgba(21, 128, 61, 0.15);
 }
 
 .self {
-  color: var(--slate);
-  background: var(--canvas);
+  color: var(--purple);
+  background: var(--purple-tint);
+  border: 1px solid rgba(99, 67, 216, 0.15);
 }
 
-.amount {
+.amountCell {
   font-weight: 600;
+  font-size: 14.5px;
   white-space: nowrap;
+  color: var(--ink);
 }
 
 .amountIn {
   color: var(--green);
 }
 
-/* ---------- Phone list (hidden on wide screens) ---------- */
+/* ---------- Mobile List (Cards) ---------- */
 
-.list {
+.mobileList {
   display: none;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.item {
+.mobileItem {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 13px 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--line);
+  transition: background-color 100ms ease;
+  user-select: none;
 }
 
-.item:last-child {
+.mobileItem:last-child {
   border-bottom: 0;
 }
 
-.item .direction {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-}
-
-.itemClickable {
+.mobileItemClickable {
   cursor: pointer;
 }
 
-.itemSelected {
-  background: var(--blue-tint);
+.mobileItemClickable:hover,
+.mobileItemClickable:active {
+  background: #f8fafc;
 }
 
-.itemText {
-  flex: 1;
+.mobileItemSelected {
+  background: var(--blue-tint) !important;
+}
+
+.mobileLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
+  flex: 1;
+}
+
+.mobileLeft .direction {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.mobileDetails {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
-.itemTitle {
+.mobileTitle {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.itemMeta {
+.mobileMeta {
   display: flex;
-  gap: 10px;
-  font-size: 12.5px;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
   color: var(--slate);
   white-space: nowrap;
   overflow: hidden;
 }
 
-.itemDescription {
+.dotSeparator {
+  color: var(--muted);
+}
+
+.mobileDesc {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-@media (max-width: 720px) {
-  .table {
+.mobileRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex: none;
+}
+
+@media (max-width: 768px) {
+  .tableWrap {
     display: none;
   }
 
-  .list {
+  .mobileList {
     display: block;
   }
 }

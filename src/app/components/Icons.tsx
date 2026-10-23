@@ -134,6 +134,13 @@ export const ArrowDownLeftIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const ArrowRightIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
+  </Icon>
+);
+
 export const PlayIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M7 5.5v13l10-6.5-10-6.5Z" />
@@ -144,5 +151,50 @@ export const LockIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="5" y="10.5" width="14" height="10" rx="2" />
     <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+  </Icon>
+);
+
+export const CopyIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </Icon>
+);
+
+export const SearchIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
+  </Icon>
+);
+
+export const ChipIcon = ({ size = 28 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={Math.round((size * 22) / 28)}
+    viewBox="0 0 32 26"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <rect x="0.5" y="0.5" width="31" height="25" rx="4.5" fill="#e5b85a" stroke="#cca03a" />
+    <path d="M1 9.5H11.5M1 16.5H11.5M20.5 9.5H31M20.5 16.5H31" stroke="#a0781e" strokeWidth="1.2" />
+    <rect x="11.5" y="5.5" width="9" height="15" rx="2" fill="#d9a842" stroke="#a0781e" strokeWidth="1.2" />
+    <path d="M16 5.5V20.5" stroke="#a0781e" strokeWidth="1" />
+  </svg>
+);
+
+export const ContactlessIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M8.5 16.5a6 6 0 0 1 0-9" />
+    <path d="M12 19a10 10 0 0 0 0-14" />
+    <path d="M15.5 21.5a14 14 0 0 0 0-19" />
+  </Icon>
+);
+
+export const SparklesIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="m12 3-1.9 5.1L5 10l5.1 1.9L12 17l1.9-5.1L19 10l-5.1-1.9L12 3z" />
+    <path d="M19 16l-.9 2.1L16 19l2.1.9L19 22l.9-2.1L22 19l-2.1-.9L19 16z" />
   </Icon>
 );

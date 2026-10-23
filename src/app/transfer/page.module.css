@@ -1,16 +1,17 @@
 .page {
-  max-width: 640px;
+  max-width: 660px;
 }
 
-/* ---------- Stepper: this content is a sequence, so it is numbered ---------- */
+/* ---------- Stepper ---------- */
 
 .stepper {
   display: flex;
   align-items: center;
   gap: 8px;
   list-style: none;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
   padding: 0;
+  overflow-x: auto;
 }
 
 .stepItem {
@@ -20,6 +21,7 @@
   font-size: 13.5px;
   font-weight: 500;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .stepItem + .stepItem::before {
@@ -28,30 +30,34 @@
   width: 24px;
   height: 1px;
   background: var(--line-strong);
+  flex: none;
 }
 
 .stepDot {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  font-size: 11.5px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--slate);
   background: var(--paper);
   border: 1px solid var(--line-strong);
   border-radius: 50%;
+  transition: all 140ms ease;
 }
 
 .stepItem[data-state="current"] {
   color: var(--ink);
+  font-weight: 600;
 }
 
 .stepItem[data-state="current"] .stepDot {
-  color: #fff;
+  color: #ffffff;
   background: var(--blue);
   border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 84, 215, 0.18);
 }
 
 .stepItem[data-state="done"] {
@@ -61,28 +67,48 @@
 .stepItem[data-state="done"] .stepDot {
   color: var(--blue);
   background: var(--blue-tint);
-  border-color: transparent;
+  border-color: rgba(37, 84, 215, 0.3);
 }
 
 .alert {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-/* ---------- Details form ---------- */
+/* ---------- From Account Card ---------- */
 
-.fromBlock {
-  margin-bottom: 20px;
-  padding: 12px 14px;
-  background: var(--canvas);
+.fromCard {
+  margin-bottom: 22px;
+  padding: 14px 18px;
+  background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
 }
 
+.fromTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
 .fromLabel {
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--slate);
-  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fromSecureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--purple);
+  background: var(--purple-tint);
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
 .fromRow {
@@ -91,14 +117,99 @@
   align-items: baseline;
   gap: 12px;
   flex-wrap: wrap;
-  font-size: 14.5px;
-  font-weight: 500;
+}
+
+.fromAccNum {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .fromBalance {
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 13.5px;
   color: var(--slate);
+}
+
+.hintTag {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ---------- Quick Recipient Pills ---------- */
+
+.quickRecipients {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.quickRecLabel {
+  font-size: 11.5px;
+  color: var(--slate);
+}
+
+.recPill {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-tint);
+  border: 1px solid rgba(37, 84, 215, 0.18);
+  border-radius: 9999px;
+  padding: 3px 9px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.recPill:hover {
+  background: rgba(37, 84, 215, 0.15);
+  border-color: var(--blue);
+}
+
+/* ---------- Amount Presets ---------- */
+
+.remainingEst {
+  font-size: 12px;
+  color: var(--slate);
+  font-weight: 500;
+}
+
+.remainingNegative {
+  color: var(--red) !important;
+}
+
+.amountPresets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: #f1f5f9;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.presetBtn:hover {
+  background: #e2e8f0;
+  color: var(--ink);
+}
+
+.presetMax {
+  color: var(--blue);
+  background: var(--blue-tint);
+  border-color: rgba(37, 84, 215, 0.2);
+  font-weight: 600;
 }
 
 .optional {
@@ -109,16 +220,72 @@
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
-/* ---------- Review and receipt ---------- */
+/* ---------- Review Step: Visual Flow Diagram ---------- */
 
 .sectionTitle {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: 20px;
+}
+
+.flowDiagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  margin-bottom: 22px;
+}
+
+.flowNode {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.flowLabel {
+  font-size: 11.5px;
+  color: var(--slate);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.flowArrow {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.flowArrowLine {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--line-strong);
+  z-index: 1;
+}
+
+.flowBadge {
+  position: relative;
+  z-index: 2;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--blue);
+  background: #ffffff;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(37, 84, 215, 0.25);
+  box-shadow: var(--shadow-xs);
 }
 
 .summary {
@@ -139,6 +306,7 @@
 .summaryRow dt {
   color: var(--slate);
   flex: none;
+  font-size: 13.5px;
 }
 
 .summaryRow dd {
@@ -149,27 +317,52 @@
 }
 
 .summaryAmount {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
 }
 
-.reviewNote {
-  margin: 16px 0 20px;
-  font-size: 13.5px;
+.cryptoNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 14px 16px;
+  background: var(--purple-tint);
+  border: 1px solid rgba(99, 67, 216, 0.18);
+  border-radius: var(--radius-control);
+  font-size: 13px;
   line-height: 1.5;
-  color: var(--slate);
+  color: var(--ink-2);
+}
+
+.cryptoNotice strong {
+  display: block;
+  color: var(--purple);
+  margin-bottom: 3px;
 }
 
 .keyWait {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: -8px 0 20px;
+  margin: 12px 0;
   font-size: 13.5px;
-  color: var(--ink-2);
+  color: var(--slate);
 }
 
-/* ---------- Verification timeline ---------- */
+/* ---------- Cryptographic Execution Timeline ---------- */
+
+.executingBody {
+  padding: 28px 24px;
+}
+
+.executingHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
 
 .timeline {
   list-style: none;
@@ -184,18 +377,19 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 10px 0;
-  font-size: 14.5px;
-  color: var(--ink-2);
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--slate);
+  transition: all 140ms ease;
 }
 
 .timelineItem + .timelineItem::before {
   content: "";
   position: absolute;
-  left: 11px;
+  left: 12px;
   top: -8px;
-  width: 1px;
-  height: 16px;
+  width: 2px;
+  height: 20px;
   background: var(--line-strong);
 }
 
@@ -204,47 +398,109 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   color: var(--purple);
   background: var(--purple-tint);
+  border: 1px solid rgba(99, 67, 216, 0.2);
 }
 
 .timelineItem[data-state="active"] {
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .timelineItem[data-state="active"] .timelineMarker {
   background: transparent;
+  border-color: transparent;
 }
 
-.successHead {
+.timelineItem[data-state="done"] {
+  color: var(--ink-2);
+}
+
+.timelineItem[data-state="done"] .timelineMarker {
+  color: var(--green);
+  background: var(--green-tint);
+  border-color: rgba(21, 128, 61, 0.2);
+}
+
+.timelineText {
+  flex: 1;
+}
+
+/* ---------- Receipt Card ---------- */
+
+.receiptCard {
+  padding: 24px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.receiptTop {
+  text-align: center;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
 }
 
 .successIcon {
-  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   color: var(--green);
   background: var(--green-tint);
-  border-radius: 50%;
+  border: 1px solid rgba(21, 128, 61, 0.25);
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.15);
+  margin-bottom: 12px;
 }
 
-.sentAmount {
-  margin-bottom: 18px;
-  font-size: 32px;
-  font-weight: 600;
+.receiptTitle {
+  font-size: 22px;
+  font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--ink);
 }
+
+.receiptSub {
+  font-size: 13px;
+  color: var(--slate);
+  margin-top: 2px;
+}
+
+.receiptAmount {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-top: 14px;
+}
+
+.receiptCurrency {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--slate);
+}
+
+.receiptDivider {
+  height: 1px;
+  background: dashed var(--line-strong);
+  margin: 0 0 16px;
+}
+
+.receiptCopyRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
   .stepLabel {
@@ -261,5 +517,20 @@
 
   .actions :global(.btn) {
     width: 100%;
+  }
+
+  .flowDiagram {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .flowArrow {
+    padding: 8px 0;
+  }
+
+  .flowArrowLine {
+    display: none;
   }
 }

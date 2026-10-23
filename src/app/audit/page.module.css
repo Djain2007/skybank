@@ -2,33 +2,168 @@
   max-width: 1080px;
 }
 
+/* ---------- Filter Toolbar ---------- */
+
+.filterToolbar {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filterPills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--slate);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 130ms ease;
+}
+
+.filterPill:hover {
+  color: var(--ink);
+  border-color: #cbd5e1;
+}
+
+.filterPillActive {
+  color: var(--blue) !important;
+  background: var(--blue-tint) !important;
+  border-color: rgba(37, 84, 215, 0.25) !important;
+  font-weight: 600;
+}
+
+.pillCount {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 9999px;
+}
+
 .loadingRows {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 22px 20px;
+  gap: 12px;
+  padding: 20px;
+}
+
+/* ---------- Desktop Table ---------- */
+
+.desktopTable {
+  border-radius: inherit;
 }
 
 .timeCell {
   white-space: nowrap;
   color: var(--slate);
-  font-size: 13.5px;
+  font-size: 13px;
 }
 
-.event {
-  font-size: 12.5px;
-  font-weight: 500;
+.eventTag {
+  font-size: 12px;
+  font-weight: 600;
   color: var(--ink-2);
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
   white-space: nowrap;
 }
 
 .detailsCell {
-  min-width: 260px;
+  min-width: 280px;
   color: var(--ink-2);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* ---------- Mobile Card Feed ---------- */
+
+.mobileFeed {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobileCard {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobileCard:last-child {
+  border-bottom: 0;
+}
+
+.mobileCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobileCardTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mobileTime {
+  font-size: 12px;
+  color: var(--slate);
+}
+
+.mobileDetails {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  background: #f8fafc;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+}
+
+.mobileCardFooter {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .note {
-  margin-top: 16px;
+  margin-top: 18px;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .desktopTable {
+    display: none;
+  }
+
+  .mobileFeed {
+    display: block;
+  }
 }

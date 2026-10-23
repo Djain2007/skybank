@@ -8,26 +8,49 @@ import TransactionTable from './components/TransactionTable';
 import CopyButton from './components/CopyButton';
 import { useSession } from './components/Session';
 import {
-  ChipIcon,
-  ContactlessIcon,
   TransferIcon,
   ShieldIcon,
   FlaskIcon,
   FileIcon,
   ArrowRightIcon,
   LockIcon,
-  SparklesIcon,
 } from './components/Icons';
 import type { Transaction } from '@/lib/types';
 import { formatAmount } from '@/lib/format';
 import styles from './page.module.css';
 
-const protections = [
-  { label: 'Transfer payload encryption', value: 'AES-256-GCM', status: 'Sealed' },
-  { label: 'Key exchange mechanism', value: 'RSA-OAEP 4096', status: 'Secured' },
-  { label: 'Transaction digital signatures', value: 'RSA-PSS 4096', status: 'Enforced' },
-  { label: 'Credential hashing algorithm', value: 'Argon2id', status: 'Hardened' },
-  { label: 'Replay protection system', value: 'Nonce + Timestamp', status: 'Active' },
+interface SecurityLayer {
+  purpose: string;
+  algorithm: string;
+  scope: string;
+}
+
+const securityLayers: SecurityLayer[] = [
+  {
+    purpose: 'Transfer Payload Encryption',
+    algorithm: 'AES-256-GCM',
+    scope: 'Seals transaction data in browser prior to transmission',
+  },
+  {
+    purpose: 'Key Exchange Mechanism',
+    algorithm: 'RSA-OAEP 4096',
+    scope: "Wraps one-time AES key for server's public key only",
+  },
+  {
+    purpose: 'Transaction Digital Signatures',
+    algorithm: 'RSA-PSS 4096',
+    scope: 'Client-signed canonical payload proves authenticity',
+  },
+  {
+    purpose: 'Credential Hashing',
+    algorithm: 'Argon2id',
+    scope: 'Memory-hard password hashing with per-user salt',
+  },
+  {
+    purpose: 'Replay Protection',
+    algorithm: 'Nonce + Timestamp',
+    scope: 'Unique 96-bit IV cache prevents message reuse',
+  },
 ];
 
 export default function Dashboard() {
@@ -56,203 +79,194 @@ function Overview() {
     <div className={styles.page}>
       <PageHeader
         title={`Welcome back, ${firstName}`}
-        description="Your account is protected with client-side RSA-PSS signatures and hybrid encryption."
+        description="SkyBank simulator balances are educational. All cryptographic encryption, signing, and verification are real."
+        action={
+          <Link href="/transfer" className="btn btn-primary">
+            <TransferIcon size={16} />
+            <span>New Transfer</span>
+          </Link>
+        }
       />
 
-      <div className={styles.grid}>
-        {/* Main Column */}
-        <div className={styles.primary}>
-          {/* Executive Digital Bank Card */}
-          <section className={styles.cardHero} aria-labelledby="balance-label">
-            {/* Background metallic shimmer overlay */}
-            <div className={styles.cardShimmer} aria-hidden="true" />
-
-            <div className={styles.cardHeader}>
-              <div className={styles.cardBrand}>
-                <span className={styles.bankName}>SkyBank</span>
-                <span className={styles.cardTier}>TITANIUM CIPHER</span>
-              </div>
-              <div className={styles.cardIcons}>
-                <ContactlessIcon size={20} />
-                <span className={styles.statusLive}>
-                  <span className={styles.statusLiveDot} /> Live
-                </span>
-              </div>
+      {/* Primary Account Balance Panel */}
+      <section className={styles.balancePanel} aria-labelledby="balance-heading">
+        <div className={styles.balanceTop}>
+          <div className={styles.accountIdentity}>
+            <span className={styles.accountType}>Primary Educational Account</span>
+            <div className={styles.accountNumRow}>
+              <span className={`${styles.accountNumber} mono`}>{session.account.accountNumber}</span>
+              <CopyButton
+                value={session.account.accountNumber}
+                toastLabel="Account number copied to clipboard"
+                size="sm"
+                className={styles.copyBtnOnDark}
+              />
             </div>
-
-            <div className={styles.chipRow}>
-              <ChipIcon size={34} />
-              <div className={styles.cipherTag}>
-                <LockIcon size={12} />
-                <span>WebCrypto API Verified</span>
-              </div>
-            </div>
-
-            <div className={styles.balanceArea}>
-              <span id="balance-label" className={styles.balanceLabel}>
-                Total Available Balance
-              </span>
-              <div className={`${styles.balanceAmount} num`}>
-                {formatAmount(session.account.balance)}
-                <span className={styles.balanceUnit}>SKY</span>
-              </div>
-            </div>
-
-            <div className={styles.cardFooter}>
-              <div className={styles.accountBlock}>
-                <span className={styles.accountLabel}>Account Number</span>
-                <div className={styles.accountNumRow}>
-                  <span className={`${styles.accountNumber} mono`}>{session.account.accountNumber}</span>
-                  <CopyButton
-                    value={session.account.accountNumber}
-                    toastLabel="Account number copied"
-                    size="sm"
-                    className={styles.cardCopyBtn}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.cardActions}>
-                <Link href="/transfer" className="btn btn-on-dark btn-sm">
-                  <TransferIcon size={16} />
-                  <span>Send SKY</span>
-                </Link>
-                <Link href="/transactions" className="btn btn-on-dark-ghost btn-sm">
-                  <span>History</span>
-                </Link>
-              </div>
-            </div>
-          </section>
-
-          {/* Quick Action Tiles */}
-          <div className={styles.quickGrid}>
-            <Link href="/transfer" className={styles.quickTile}>
-              <div className={`${styles.quickIconWrap} ${styles.blueIcon}`}>
-                <TransferIcon size={18} />
-              </div>
-              <div className={styles.quickText}>
-                <span className={styles.quickTitle}>Make Transfer</span>
-                <span className={styles.quickDesc}>Hybrid encrypted payload</span>
-              </div>
-              <ArrowRightIcon size={15} className={styles.quickArrow} />
-            </Link>
-
-            <Link href="/crypto-lab" className={styles.quickTile}>
-              <div className={`${styles.quickIconWrap} ${styles.purpleIcon}`}>
-                <FlaskIcon size={18} />
-              </div>
-              <div className={styles.quickText}>
-                <span className={styles.quickTitle}>Crypto Lab</span>
-                <span className={styles.quickDesc}>Test SHA-256 & HMAC</span>
-              </div>
-              <ArrowRightIcon size={15} className={styles.quickArrow} />
-            </Link>
-
-            <Link href="/security-tests" className={styles.quickTile}>
-              <div className={`${styles.quickIconWrap} ${styles.amberIcon}`}>
-                <ShieldIcon size={18} />
-              </div>
-              <div className={styles.quickText}>
-                <span className={styles.quickTitle}>Security Tests</span>
-                <span className={styles.quickDesc}>Simulate real attacks</span>
-              </div>
-              <ArrowRightIcon size={15} className={styles.quickArrow} />
-            </Link>
-
-            <Link href="/audit" className={styles.quickTile}>
-              <div className={`${styles.quickIconWrap} ${styles.greenIcon}`}>
-                <FileIcon size={18} />
-              </div>
-              <div className={styles.quickText}>
-                <span className={styles.quickTitle}>Audit Log</span>
-                <span className={styles.quickDesc}>Server-side events</span>
-              </div>
-              <ArrowRightIcon size={15} className={styles.quickArrow} />
-            </Link>
           </div>
 
-          {/* Recent Activity Card */}
-          <section className="card" aria-labelledby="recent-title">
-            <div className="card-header">
-              <div className={styles.recentHead}>
-                <h2 id="recent-title" className="card-title">
-                  Recent Activity
-                </h2>
-                {recent.length > 0 && (
-                  <span className={styles.countBadge}>{recent.length} recent</span>
-                )}
-              </div>
-              {recent.length > 0 && (
-                <Link href="/transactions" className={styles.cardLink}>
-                  View all transactions
-                  <ArrowRightIcon size={14} />
-                </Link>
-              )}
-            </div>
-
-            {transactions === null ? (
-              <div className={styles.loadingRows} aria-busy="true">
-                {[0, 1, 2].map((i) => (
-                  <span key={i} className="skeleton" style={{ height: 48, borderRadius: 8 }} />
-                ))}
-              </div>
-            ) : recent.length === 0 ? (
-              <div className="table-empty">
-                <p>No transactions recorded yet.</p>
-                <p style={{ marginTop: 6, fontSize: 13, color: 'var(--muted)' }}>
-                  Send your first transfer to inspect the real AES ciphertext, nonce, tag, and RSA signature.
-                </p>
-                <div style={{ marginTop: 16 }}>
-                  <Link href="/transfer" className="btn btn-primary btn-sm">
-                    Make a transfer
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <TransactionTable transactions={recent} mine={session.account.accountNumber} />
-            )}
-          </section>
+          <div className={styles.securityStatus}>
+            <span className={styles.statusDot} />
+            <span>WebCrypto Active</span>
+          </div>
         </div>
 
-        {/* Sidebar: Protection Stack */}
-        <aside className={styles.secondary}>
-          <section className="card" aria-labelledby="protection-title">
+        <div className={styles.balanceMain}>
+          <div className={styles.balanceLabel} id="balance-heading">Available Balance</div>
+          <div className={`${styles.balanceAmount} num`}>
+            {formatAmount(session.account.balance)}
+            <span className={styles.balanceUnit}>SKY</span>
+          </div>
+        </div>
+
+        <div className={styles.balanceBottom}>
+          <div className={styles.balanceSubtext}>
+            1 SKY = 1 Simulated SkyCoin. No real-currency value.
+          </div>
+          <div className={styles.balanceActions}>
+            <Link href="/transfer" className="btn btn-on-dark btn-sm">
+              <TransferIcon size={15} />
+              <span>Send Funds</span>
+            </Link>
+            <Link href="/transactions" className="btn btn-on-dark-ghost btn-sm">
+              <span>View History</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Action Navigation Strip (No layout collision with sidebar) */}
+      <nav className={styles.quickStrip} aria-label="Quick operations">
+        <Link href="/transfer" className={styles.quickCard}>
+          <div className={`${styles.quickIconWrap} ${styles.blueIcon}`}>
+            <TransferIcon size={18} />
+          </div>
+          <div className={styles.quickContent}>
+            <div className={styles.quickTitleRow}>
+              <span className={styles.quickTitle}>Make a Transfer</span>
+              <ArrowRightIcon size={14} className={styles.quickArrow} />
+            </div>
+            <span className={styles.quickDesc}>Hybrid AES-GCM + RSA-PSS flow</span>
+          </div>
+        </Link>
+
+        <Link href="/crypto-lab" className={styles.quickCard}>
+          <div className={`${styles.quickIconWrap} ${styles.purpleIcon}`}>
+            <FlaskIcon size={18} />
+          </div>
+          <div className={styles.quickContent}>
+            <div className={styles.quickTitleRow}>
+              <span className={styles.quickTitle}>Cryptography Lab</span>
+              <ArrowRightIcon size={14} className={styles.quickArrow} />
+            </div>
+            <span className={styles.quickDesc}>Test SHA-256 & HMAC algorithms</span>
+          </div>
+        </Link>
+
+        <Link href="/security-tests" className={styles.quickCard}>
+          <div className={`${styles.quickIconWrap} ${styles.amberIcon}`}>
+            <ShieldIcon size={18} />
+          </div>
+          <div className={styles.quickContent}>
+            <div className={styles.quickTitleRow}>
+              <span className={styles.quickTitle}>Security Tests</span>
+              <ArrowRightIcon size={14} className={styles.quickArrow} />
+            </div>
+            <span className={styles.quickDesc}>Simulate tampering & replay attacks</span>
+          </div>
+        </Link>
+
+        <Link href="/audit" className={styles.quickCard}>
+          <div className={`${styles.quickIconWrap} ${styles.greenIcon}`}>
+            <FileIcon size={18} />
+          </div>
+          <div className={styles.quickContent}>
+            <div className={styles.quickTitleRow}>
+              <span className={styles.quickTitle}>Audit Log</span>
+              <ArrowRightIcon size={14} className={styles.quickArrow} />
+            </div>
+            <span className={styles.quickDesc}>Inspect server-recorded security events</span>
+          </div>
+        </Link>
+      </nav>
+
+      {/* Lower Dashboard Content Grid */}
+      <div className={styles.dashboardGrid}>
+        {/* Left Column: Recent Activity */}
+        <section className={`card ${styles.recentSection}`} aria-labelledby="recent-title">
+          <div className="card-header">
+            <div className={styles.recentTitleGroup}>
+              <h2 id="recent-title" className="card-title">
+                Recent Transactions
+              </h2>
+              {recent.length > 0 && (
+                <span className={styles.countBadge}>{recent.length} recent</span>
+              )}
+            </div>
+            {recent.length > 0 && (
+              <Link href="/transactions" className={styles.viewAllLink}>
+                <span>View all activity</span>
+                <ArrowRightIcon size={13} />
+              </Link>
+            )}
+          </div>
+
+          {transactions === null ? (
+            <div className={styles.loadingRows} aria-busy="true">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="skeleton" style={{ height: 42, borderRadius: 6 }} />
+              ))}
+            </div>
+          ) : recent.length === 0 ? (
+            <div className="table-empty">
+              <p>No transaction history recorded yet.</p>
+              <p style={{ marginTop: 4, fontSize: 13, color: 'var(--muted)' }}>
+                Send a transfer to generate an authentic cryptographic envelope on the server.
+              </p>
+              <div style={{ marginTop: 14 }}>
+                <Link href="/transfer" className="btn btn-primary btn-sm">
+                  Send First Transfer
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <TransactionTable transactions={recent} mine={session.account.accountNumber} />
+          )}
+        </section>
+
+        {/* Right Column: Security Architecture */}
+        <aside className={styles.securitySidebar}>
+          <section className="card" aria-labelledby="security-heading">
             <div className="card-header">
-              <div className={styles.shieldHead}>
-                <ShieldIcon size={18} />
-                <h2 id="protection-title" className="card-title">
+              <div className={styles.securityHeadTitle}>
+                <LockIcon size={16} />
+                <h2 id="security-heading" className="card-title">
                   Security Architecture
                 </h2>
               </div>
-              <span className={styles.activePill}>
-                <SparklesIcon size={12} />
-                5 Layers
-              </span>
+              <span className="badge badge-crypto">5 Layers Active</span>
             </div>
 
-            <div className={styles.shieldIntro}>
-              Every simulated transaction undergoes local hybrid envelope encryption before network transmission.
+            <div className={styles.securityIntro}>
+              Every transfer is encrypted and digitally signed in the client browser before network transit.
             </div>
 
-            <dl className={styles.protections}>
-              {protections.map((item) => (
-                <div key={item.label} className={styles.protectionRow}>
-                  <dt>
-                    <span className={styles.protDot} />
-                    <span className={styles.protLabel}>{item.label}</span>
+            <dl className={styles.securityList}>
+              {securityLayers.map((layer) => (
+                <div key={layer.purpose} className={styles.securityItem}>
+                  <dt className={styles.securityItemHead}>
+                    <span className={styles.securityPurpose}>{layer.purpose}</span>
+                    <span className="tag">{layer.algorithm}</span>
                   </dt>
-                  <dd>
-                    <span className="tag">{item.value}</span>
-                  </dd>
+                  <dd className={styles.securityScope}>{layer.scope}</dd>
                 </div>
               ))}
             </dl>
 
-            <div className={styles.cardFoot}>
-              <span>Want to verify the defenses?</span>
+            <div className={styles.securityFoot}>
+              <span className={styles.footText}>Verify defense mechanics:</span>
               <div className={styles.footLinks}>
                 <Link href="/crypto-lab" className={styles.footLink}>
-                  Open Crypto Lab &rarr;
+                  Open Cryptography Lab &rarr;
                 </Link>
                 <Link href="/security-tests" className={styles.footLink}>
                   Run Security Attacks &rarr;

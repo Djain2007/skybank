@@ -1,60 +1,83 @@
-/* ------------------------------------------------------------------
-   SkyBank Design System & Tokens
-
-   Two primary layers:
-   - Blue   → The banking layer (money, actions, balance, accounts)
-   - Purple → The cryptographic layer (keys, signatures, nonces, verification)
-   ------------------------------------------------------------------ */
+/* ==================================================================
+   SkyBank — Core Design Tokens & Foundations
+   A refined, trustworthy financial software aesthetic (inspired by
+   Stripe, Mercury, Linear, Ramp). Restrained, precise, accessible.
+   ================================================================== */
 
 :root {
-  --canvas: #f8fafc;
+  /* Surface & Canvas */
+  --canvas: #f7f8fa;
   --paper: #ffffff;
   --paper-elevated: #ffffff;
+  --surface-subtle: #f2f4f7;
+  --surface-hover: #eef1f6;
 
-  --ink: #0f172a;
-  --ink-2: #334155;
-  --slate: #64748b;
-  --muted: #94a3b8;
+  /* Typography Colors */
+  --ink: #172033;
+  --ink-secondary: #3e485e;
+  --slate: #667085;
+  --muted: #8c97ad;
 
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
+  /* Borders & Dividers */
+  --line: #e3e7ef;
+  --line-strong: #cbd2df;
+  --line-focus: #3156d9;
 
-  --blue: #2554d7;
-  --blue-hover: #1d44b8;
-  --blue-deep: #0f1c4d;
-  --blue-deep-2: #182865;
-  --blue-tint: #eff4fe;
+  /* Banking Layer — Financial Action Blue */
+  --blue: #3156d9;
+  --blue-hover: #2445b8;
+  --blue-active: #1d3999;
+  --blue-tint: #eef2fd;
+  --blue-deep: #131c38;
+  --blue-deep-surface: #1a2444;
 
-  --purple: #6343d8;
-  --purple-hover: #5234c0;
-  --purple-tint: #f5f2fd;
+  /* Cryptographic Layer — Applied Security Purple */
+  --purple: #5b43d6;
+  --purple-hover: #4a34be;
+  --purple-tint: #f2effd;
+  --purple-border: #ded7fa;
 
-  --green: #15803d;
-  --green-hover: #166534;
-  --green-tint: #f0fdf4;
-  --red: #dc2626;
-  --red-tint: #fef2f2;
-  --amber: #b45309;
-  --amber-tint: #fffbeb;
+  /* Semantic Status Tokens */
+  --green: #0e7044;
+  --green-hover: #0a5734;
+  --green-tint: #edf9f2;
+  --green-border: #c6eed8;
 
-  --radius-card: 14px;
-  --radius-control: 8px;
-  --radius-badge: 6px;
+  --red: #c52828;
+  --red-hover: #a31f1f;
+  --red-tint: #fdeeee;
+  --red-border: #facdcd;
+
+  --amber: #8a5600;
+  --amber-hover: #704500;
+  --amber-tint: #fff7e6;
+  --amber-border: #ffe3b3;
+
+  /* Geometry & Radii — Restrained, architectural (no oversized bubbles) */
+  --radius-badge: 4px;
+  --radius-control: 6px;
+  --radius-card: 10px;
   --radius-pill: 9999px;
 
-  --focus-ring: 0 0 0 3px rgba(37, 84, 215, 0.18);
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.04);
-  --shadow-float: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  /* Elevation & Shadows — Subtle, functional (no heavy neon glows) */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+  --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.04), 0 0 0 1px rgba(16, 24, 40, 0.03);
+  --shadow-dropdown: 0 10px 24px -4px rgba(16, 24, 40, 0.12), 0 4px 6px -2px rgba(16, 24, 40, 0.04);
+  --shadow-drawer: 0 20px 32px rgba(16, 24, 40, 0.18);
 
-  --sidebar-width: 256px;
-  --bottom-nav-height: 64px;
+  /* Focus Indicator — WCAG 2.2 AA compliant */
+  --focus-ring: 0 0 0 3px rgba(49, 86, 217, 0.2);
+
+  /* Structural Dimensions */
+  --sidebar-width: 252px;
+  --header-height: 58px;
+  --bottom-nav-height: 56px;
+  --content-max-width: 1140px;
 }
 
-/* ---------- Reset & Base ---------- */
+/* ---------- Global Reset & Box Sizing ---------- */
 
 *,
 *::before,
@@ -66,8 +89,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -76,19 +97,22 @@ html {
 }
 
 body {
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 14.5px;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--ink);
   background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
 }
 
 h1,
 h2,
 h3,
 h4,
+h5,
+h6,
 p,
 ul,
 ol,
@@ -117,7 +141,7 @@ a {
 a:hover {
   color: var(--blue-hover);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 2px;
 }
 
 button,
@@ -139,14 +163,15 @@ button {
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+  border-radius: var(--radius-control);
 }
 
 ::selection {
   background: var(--blue-tint);
-  color: var(--blue-deep);
+  color: var(--blue);
 }
 
-/* Custom modern thin scrollbars */
+/* Clean, narrow native scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -157,15 +182,15 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #cbd2df;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9aa5b9;
 }
 
-/* ---------- Typography helpers ---------- */
+/* ---------- Typography Utility Classes ---------- */
 
 .mono {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -198,53 +223,58 @@ button {
   border: 0;
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- Button System ---------- */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 42px;
-  padding: 0 18px;
-  font-size: 14px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 13.5px;
   font-weight: 500;
   line-height: 1;
   border-radius: var(--radius-control);
   border: 1px solid transparent;
   white-space: nowrap;
   user-select: none;
-  transition: all 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
   box-shadow: var(--shadow-xs);
-}
-
-.btn:active:not(:disabled) {
-  transform: scale(0.985);
 }
 
 .btn:hover {
   text-decoration: none;
 }
 
-.btn:disabled,
-.btn[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: not-allowed;
-  box-shadow: none;
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Primary Button */
 .btn-primary {
   background: var(--blue);
   color: #ffffff;
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 2px rgba(37, 84, 215, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--blue-hover);
-  box-shadow: 0 4px 12px rgba(37, 84, 215, 0.25);
 }
 
+.btn-primary:active:not(:disabled) {
+  background: var(--blue-active);
+}
+
+/* Secondary Button */
 .btn-secondary {
   background: var(--paper);
   color: var(--ink);
@@ -252,70 +282,84 @@ button {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+  background: var(--surface-subtle);
+  border-color: #b8c1d1;
 }
 
+/* Outline Button */
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+}
+
+/* Ghost Button */
 .btn-ghost {
   background: transparent;
-  color: var(--ink-2);
+  color: var(--ink-secondary);
+  border-color: transparent;
   box-shadow: none;
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: #f1f5f9;
+  background: var(--surface-subtle);
   color: var(--ink);
 }
 
+/* Button on Dark Card Surfaces */
 .btn-on-dark {
   background: #ffffff;
   color: var(--blue-deep);
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .btn-on-dark:hover:not(:disabled) {
   background: #f8fafc;
   color: var(--blue);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
 .btn-on-dark-ghost {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.18);
   box-shadow: none;
 }
 
 .btn-on-dark-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Sizing Modifiers */
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  height: 44px;
+  padding: 0 20px;
+  font-size: 14.5px;
 }
 
 .btn-block {
   width: 100%;
 }
 
-.btn-lg {
-  height: 46px;
-  padding: 0 22px;
-  font-size: 15px;
-}
-
-.btn-sm {
-  height: 34px;
-  padding: 0 12px;
-  font-size: 13px;
-  border-radius: 6px;
-}
-
 .icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-control);
   color: var(--slate);
   border: 1px solid transparent;
@@ -323,13 +367,9 @@ button {
 }
 
 .icon-btn:hover {
-  background: #f1f5f9;
+  background: var(--surface-subtle);
   color: var(--ink);
   border-color: var(--line);
-}
-
-.icon-btn:active {
-  transform: scale(0.96);
 }
 
 /* ---------- Forms & Inputs ---------- */
@@ -338,33 +378,34 @@ button {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .label {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--ink-2);
+  color: var(--ink-secondary);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .hint {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--slate);
+  font-weight: 400;
 }
 
 .input {
   width: 100%;
-  height: 44px;
-  padding: 0 14px;
-  font-size: 15px;
+  height: 40px;
+  padding: 0 13px;
+  font-size: 14px;
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-control);
-  transition: border-color 140ms ease, box-shadow 140ms ease;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
   box-shadow: var(--shadow-xs);
 }
 
@@ -373,7 +414,7 @@ button {
 }
 
 .input:hover {
-  border-color: #94a3b8;
+  border-color: #adb7ca;
 }
 
 .input:focus {
@@ -383,7 +424,7 @@ button {
 }
 
 .input:disabled {
-  background: #f1f5f9;
+  background: var(--surface-subtle);
   color: var(--slate);
   cursor: not-allowed;
 }
@@ -395,22 +436,22 @@ button {
 }
 
 .input-group .input {
-  padding-right: 64px;
+  padding-right: 56px;
 }
 
 .input-suffix {
   position: absolute;
-  right: 14px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--slate);
   pointer-events: none;
   user-select: none;
 }
 
-/* ---------- Cards ---------- */
+/* ---------- Cards & Panels ---------- */
 
 .card {
   background: var(--paper);
@@ -418,7 +459,6 @@ button {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: box-shadow 180ms ease, border-color 180ms ease;
 }
 
 .card-header {
@@ -432,9 +472,10 @@ button {
 }
 
 .card-title {
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .card-body {
@@ -451,26 +492,26 @@ button {
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .table th {
-  padding: 11px 16px;
-  font-size: 12.5px;
-  font-weight: 500;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--slate);
   text-align: left;
   white-space: nowrap;
-  background: #f8fafc;
+  background: #fafbfc;
   border-bottom: 1px solid var(--line);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 .table td {
-  padding: 14px 16px;
+  padding: 12px 16px;
   vertical-align: middle;
   border-bottom: 1px solid var(--line);
-  color: var(--ink-2);
+  color: var(--ink-secondary);
 }
 
 .table th:first-child,
@@ -489,11 +530,10 @@ button {
 
 .table .is-clickable {
   cursor: pointer;
-  transition: background-color 100ms ease;
 }
 
 .table .is-clickable:hover td {
-  background: #f1f5f9;
+  background: var(--surface-subtle);
 }
 
 .table .is-selected td {
@@ -503,7 +543,7 @@ button {
 .table-empty {
   padding: 36px 20px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--slate);
   line-height: 1.6;
 }
@@ -512,15 +552,15 @@ button {
   text-align: right;
 }
 
-/* ---------- Badges & Tags ---------- */
+/* ---------- Status Badges & Algorithm Tags ---------- */
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 24px;
-  padding: 0 9px;
-  font-size: 12px;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11.5px;
   font-weight: 500;
   line-height: 1;
   border-radius: var(--radius-badge);
@@ -530,8 +570,8 @@ button {
 
 .badge::before {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
 }
@@ -539,45 +579,46 @@ button {
 .badge-success {
   color: var(--green);
   background: var(--green-tint);
-  border-color: rgba(21, 128, 61, 0.15);
+  border-color: var(--green-border);
 }
 
 .badge-error {
   color: var(--red);
   background: var(--red-tint);
-  border-color: rgba(220, 38, 38, 0.15);
+  border-color: var(--red-border);
 }
 
 .badge-warning {
   color: var(--amber);
   background: var(--amber-tint);
-  border-color: rgba(180, 83, 9, 0.15);
+  border-color: var(--amber-border);
 }
 
 .badge-neutral {
-  color: var(--ink-2);
-  background: #f1f5f9;
+  color: var(--ink-secondary);
+  background: var(--surface-subtle);
   border-color: var(--line);
 }
 
 .badge-crypto {
   color: var(--purple);
   background: var(--purple-tint);
-  border-color: rgba(99, 67, 216, 0.15);
+  border-color: var(--purple-border);
 }
 
+/* Algorithmic tag — names an algorithm without a status dot */
 .tag {
   display: inline-flex;
   align-items: center;
-  height: 24px;
-  padding: 0 8px;
+  height: 22px;
+  padding: 0 7px;
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1;
   color: var(--purple);
   background: var(--purple-tint);
-  border: 1px solid rgba(99, 67, 216, 0.14);
+  border: 1px solid var(--purple-border);
   border-radius: var(--radius-badge);
   white-space: nowrap;
 }
@@ -587,8 +628,8 @@ button {
 .alert {
   display: flex;
   gap: 12px;
-  padding: 13px 16px;
-  font-size: 14px;
+  padding: 12px 14px;
+  font-size: 13.5px;
   line-height: 1.5;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
@@ -608,31 +649,31 @@ button {
 .alert-error {
   color: var(--red);
   background: var(--red-tint);
-  border-color: rgba(220, 38, 38, 0.2);
+  border-color: var(--red-border);
 }
 
 .alert-success {
   color: var(--green);
   background: var(--green-tint);
-  border-color: rgba(21, 128, 61, 0.2);
+  border-color: var(--green-border);
 }
 
 .alert-info {
   color: var(--blue-deep);
   background: var(--blue-tint);
-  border-color: rgba(37, 84, 215, 0.2);
+  border-color: rgba(49, 86, 217, 0.2);
 }
 
-/* ---------- Code blocks ---------- */
+/* ---------- Cryptographic Code Blocks ---------- */
 
 .code-block {
   display: block;
-  padding: 11px 13px;
+  padding: 10px 12px;
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  background: #f8fafc;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+  background: #fbfcfd;
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
   word-break: break-all;
@@ -641,16 +682,16 @@ button {
 }
 
 .code-block.is-scroll {
-  max-height: 130px;
+  max-height: 120px;
   overflow-y: auto;
 }
 
-/* ---------- Loading ---------- */
+/* ---------- Spinners & Skeletons ---------- */
 
 .spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border: 2px solid var(--line-strong);
   border-top-color: var(--blue);
   border-radius: 50%;
@@ -664,8 +705,8 @@ button {
 
 .skeleton {
   display: block;
-  background: #e2e8f0;
-  border-radius: 6px;
+  background: var(--line);
+  border-radius: var(--radius-badge);
   animation: pulse 1.4s ease-in-out infinite;
 }
 

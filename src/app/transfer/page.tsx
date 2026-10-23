@@ -11,9 +11,7 @@ import {
   CheckIcon,
   LockIcon,
   ShieldIcon,
-  TransferIcon,
   ArrowRightIcon,
-  InfoIcon,
 } from '../components/Icons';
 import {
   canonicalizeTransaction,
@@ -439,7 +437,7 @@ function Transfer() {
                 <strong>Client-Side Cryptographic Guarantee</strong>
                 <span>
                   By confirming, this exact payload is canonicalized, hashed with SHA-256, and signed
-                  with your browser's RSA-PSS private key. Any modification in transit will cause the server to reject it.
+                  with your browser&apos;s RSA-PSS private key. Any modification in transit will cause the server to reject it.
                 </span>
               </div>
             </div>

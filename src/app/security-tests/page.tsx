@@ -6,7 +6,12 @@ import DashboardLayout from '../components/DashboardLayout';
 import PageHeader from '../components/PageHeader';
 import CopyButton from '../components/CopyButton';
 import { useSession } from '../components/Session';
-import { PlayIcon, ShieldIcon, AlertIcon, CheckIcon, LockIcon } from '../components/Icons';
+import {
+  PlayIcon,
+  ShieldIcon,
+  CheckCircleIcon,
+  AlertTriangleIcon,
+} from '../components/Icons';
 import {
   canonicalizeTransaction,
   generateAESKey,
@@ -32,7 +37,7 @@ const tests: TestCase[] = [
     name: 'Amount Tampering in Transit',
     category: 'Integrity Violation',
     attack: 'Sign a valid transfer of 5,000 SKY in the browser, but alter the transmitted amount to 50,000 SKY.',
-    defence: 'The RSA-PSS signature verification validates the canonical amount. Since 50,000 ≠ 5,000, signature check fails.',
+    defence: 'The RSA-PSS signature verification validates the canonical amount. Since the transmitted amount differs from the signed digest, verification fails.',
   },
   {
     type: 'Signature Tampering',
@@ -179,7 +184,7 @@ function SecurityTests() {
         setResult('WARNING: Transaction succeeded when it should have been refused!');
       }
 
-      // TEST 4: Replay Attack (Send the identical payload again)
+      // TEST 4: Replay Attack (Send duplicate payload with reused nonce)
       if (testType === 'Replay Attack' && res.ok) {
         setStatus('Replay step 1 completed. Now transmitting duplicate payload with identical nonce...');
         await new Promise((r) => setTimeout(r, 400));
@@ -238,15 +243,15 @@ function SecurityTests() {
                 <button
                   type="button"
                   onClick={() => runTest(test.type)}
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-secondary btn-sm"
                   disabled={running !== null || !serverPublicKey}
                 >
                   {isRunning ? (
-                    <span className="spinner spinner-light" aria-hidden="true" />
+                    <span className="spinner" aria-hidden="true" />
                   ) : (
-                    <PlayIcon size={14} />
+                    <PlayIcon size={13} />
                   )}
-                  {isRunning ? 'Simulating...' : 'Simulate Attack'}
+                  <span>{isRunning ? 'Simulating...' : 'Simulate Attack'}</span>
                 </button>
               </div>
 
@@ -267,7 +272,7 @@ function SecurityTests() {
         })}
       </section>
 
-      {/* Terminal-grade Security Console */}
+      {/* Security Verification Console */}
       <section className={`card ${styles.consoleCard}`} aria-label="Test output" aria-live="polite">
         <div className="card-header">
           <div className={styles.consoleHead}>
@@ -291,7 +296,19 @@ function SecurityTests() {
 
           {result ? (
             <div className={`${styles.consoleResult} ${blocked ? styles.consoleOk : styles.consoleBad}`}>
-              <div className={styles.resultPrefix}>{blocked ? '✓ DEFENSE TRIGGERED' : '⚠ ATTENTION'}</div>
+              <div className={styles.resultPrefix}>
+                {blocked ? (
+                  <>
+                    <CheckCircleIcon size={14} />
+                    <span>DEFENSE TRIGGERED &amp; VERIFIED</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangleIcon size={14} />
+                    <span>SECURITY ATTENTION REQUIRED</span>
+                  </>
+                )}
+              </div>
               <div className={styles.resultMsg}>{result}</div>
             </div>
           ) : (

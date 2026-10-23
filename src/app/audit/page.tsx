@@ -5,7 +5,6 @@ import DashboardLayout from '../components/DashboardLayout';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
-import { ShieldIcon, FileIcon, CheckIcon, AlertIcon } from '../components/Icons';
 import type { AuditLog } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
 import styles from './page.module.css';
@@ -52,7 +51,7 @@ function AuditLogs() {
     <div className={styles.page}>
       <PageHeader
         title="Security & Audit Log"
-        description="Immutable record of security events logged by the server: cryptographic verifications, sign-ins, and all blocked attack attempts."
+        description="Record of security events logged by the server: cryptographic verifications, sign-ins, and all blocked attack attempts."
       />
 
       {/* Filter Toolbar */}
@@ -154,10 +153,8 @@ function AuditLogs() {
 
             {/* Mobile Card Feed (Prevents horizontal scrolling on phones) */}
             <ul className={styles.mobileFeed} aria-label="Audit events mobile feed">
-              {filteredLogs.map((log) => {
-                const isFail = log.result === 'FAILURE';
-                return (
-                  <li key={log.id} className={styles.mobileCard}>
+              {filteredLogs.map((log) => (
+                <li key={log.id} className={styles.mobileCard}>
                     <div className={styles.mobileCardHeader}>
                       <div className={styles.mobileCardTitleRow}>
                         <span className={`${styles.eventTag} mono`}>{log.event_type}</span>
@@ -176,8 +173,7 @@ function AuditLogs() {
                       </div>
                     )}
                   </li>
-                );
-              })}
+              ))}
             </ul>
           </>
         )}

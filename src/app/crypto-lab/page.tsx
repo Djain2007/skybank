@@ -4,7 +4,7 @@ import { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import PageHeader from '../components/PageHeader';
 import CopyButton from '../components/CopyButton';
-import { FlaskIcon, SparklesIcon, LockIcon } from '../components/Icons';
+import { LockIcon } from '../components/Icons';
 import { arrayBufferToBase64 } from '@/lib/crypto/client';
 import styles from './page.module.css';
 

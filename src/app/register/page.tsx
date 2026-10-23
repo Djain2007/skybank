@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuthLayout from '../components/AuthLayout';
-import { AlertIcon, LockIcon, ShieldIcon } from '../components/Icons';
+import { AlertIcon, ShieldIcon } from '../components/Icons';
 import { generateUserRSAKeys, exportPublicKeyToPem } from '@/lib/crypto/client';
 import styles from '../auth.module.css';
 

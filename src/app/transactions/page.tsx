@@ -45,6 +45,15 @@ function Transactions() {
       .catch(() => setTransactions([]));
   }, []);
 
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelected(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selected]);
+
   const mine = session.account.accountNumber;
 
   const filteredTransactions = useMemo(() => {

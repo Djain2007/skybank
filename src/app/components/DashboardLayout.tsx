@@ -118,11 +118,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     };
   }, [menuOpen]);
 
-  // Close drawer on path change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.replace("/login");
@@ -265,7 +260,7 @@ function SidebarContent({ session, pathname, onLogout, onClose }: SidebarProps) 
           <div key={group.label} className={styles.group} data-tone={group.tone}>
             <div className={styles.groupLabel}>{group.label}</div>
             {group.items.map((item) => {
-              const active = pathname === item.href;
+              const active = pathname === item.href || (item.href === "/audit" && pathname === "/audit-log");
               const Icon = item.icon;
               return (
                 <Link
